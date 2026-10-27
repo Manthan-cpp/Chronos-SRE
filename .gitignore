@@ -36,3 +36,5 @@ temp_repro_*
 Thumbs.db
 .vscode/
 .idea/
+
+*.log

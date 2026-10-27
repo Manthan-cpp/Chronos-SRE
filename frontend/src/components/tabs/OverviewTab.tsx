@@ -43,16 +43,6 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
               <span className="text-xs font-semibold uppercase tracking-wider text-slate-400">
                 {scenario.code}
               </span>
-              <span className={`text-xs px-2 py-0.5 rounded font-medium ${
-                scenario.severity === "CRITICAL"
-                  ? "bg-red-950/70 text-red-400 border border-red-800/60"
-                  : "bg-amber-950/70 text-amber-400 border border-amber-800/60"
-              }`}>
-                {scenario.severity} Priority
-              </span>
-              <span className="text-xs px-2 py-0.5 rounded bg-slate-900 text-slate-300 border border-slate-800">
-                {scenario.category}
-              </span>
             </div>
             <h1 className="text-xl font-semibold text-white mb-2">
               {scenario.title}

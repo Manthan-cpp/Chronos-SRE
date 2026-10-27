@@ -87,11 +87,6 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Controls */}
         <div className="flex items-center gap-3">
           {/* Status Badge */}
-          {systemStatus === "idle" && (
-            <span className="text-xs font-medium text-slate-400 bg-slate-900 border border-slate-800 px-2.5 py-1 rounded">
-              Ready
-            </span>
-          )}
           {systemStatus === "crashing" && (
             <span className="text-xs font-medium text-red-400 bg-red-950/60 border border-red-800/60 px-2.5 py-1 rounded">
               Crash Active
