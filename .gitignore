@@ -1,0 +1,38 @@
+# Chronos-SRE .gitignore
+node_modules/
+.next/
+out/
+build/
+dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+
+# Environment and Secrets (CRITICAL)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+*.key
+
+# Ephemeral sandbox runs
+sandbox_run_*
+temp_repro_*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
