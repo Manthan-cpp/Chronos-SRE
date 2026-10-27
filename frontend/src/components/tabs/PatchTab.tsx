@@ -7,7 +7,7 @@ import { Check, CheckCircle2, ExternalLink, FileCode, GitBranch, GitPullRequest,
 
 const DiffEditor = dynamic(
   () => import("@monaco-editor/react").then((mod) => mod.DiffEditor),
-  { ssr: false, loading: () => <div className="p-8 text-center text-xs text-slate-500">Loading Code Diff Engine...</div> }
+  { ssr: false, loading: () => <div className="p-8 text-center text-xs text-slate-500 font-mono">Loading Monaco Diff Engine...</div> }
 );
 
 interface PatchTabProps {
@@ -34,30 +34,30 @@ export const PatchTab: React.FC<PatchTabProps> = ({
   return (
     <div className="space-y-6">
       {/* Sandbox Test Verification Status */}
-      <div className="rounded-xl border border-slate-800/80 bg-[#0c101a]/75 backdrop-blur-md p-5 shadow-xs">
+      <div className="glass-panel rounded-2xl p-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="h-5 w-5 text-green-400" />
-            <h2 className="text-sm font-semibold text-white">
+            <ShieldCheck className="h-5 w-5 text-emerald-600" />
+            <h2 className="text-sm font-semibold tracking-tight text-slate-900">
               Deterministic Sandbox Verification
             </h2>
           </div>
 
           <div className="flex items-center gap-2">
             {sandbox.step === "reproduced_fail" && (
-              <span className="text-xs px-2.5 py-1 rounded bg-red-950/70 text-red-400 border border-red-800/60 font-medium flex items-center gap-1">
-                <XCircle className="h-3.5 w-3.5 text-red-400" />
+              <span className="text-xs px-2.5 py-1 rounded-md bg-red-100 text-red-800 border border-red-200 font-medium flex items-center gap-1.5">
+                <XCircle className="h-3.5 w-3.5 text-red-600" />
                 Reproduction Test Failed (Bug Verified)
               </span>
             )}
             {sandbox.step === "verified_pass" && (
-              <span className="text-xs px-2.5 py-1 rounded bg-green-950/70 text-green-400 border border-green-800/60 font-medium flex items-center gap-1">
-                <CheckCircle2 className="h-3.5 w-3.5 text-green-400" />
+              <span className="text-xs px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium flex items-center gap-1.5">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
                 Regression Suite Passed (100% Green)
               </span>
             )}
             {sandbox.step === "idle" && (
-              <span className="text-xs px-2.5 py-1 rounded bg-slate-900 text-slate-400 border border-slate-800">
+              <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-black/[0.05] text-slate-600 border border-black/10">
                 Sandbox Standby
               </span>
             )}
@@ -67,140 +67,108 @@ export const PatchTab: React.FC<PatchTabProps> = ({
         {/* Pytest Output Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Before: Failing Test */}
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3">
-            <div className="text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
+          <div className="glass-card rounded-xl p-4 border border-black/10">
+            <div className="text-xs font-semibold text-slate-900 mb-1.5 flex items-center justify-between">
               <span>Before Patch (Reproduction Run)</span>
-              <span className="text-red-400 font-mono text-[11px]">EXIT 1</span>
+              <span className="text-red-700 font-mono text-[11px] font-semibold bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">EXIT 1</span>
             </div>
-            <pre className="text-[11px] font-mono text-slate-200 bg-[#05070d] border border-slate-800 rounded p-2.5 overflow-x-auto leading-relaxed">
+            <pre className="text-[11px] font-mono text-slate-200 bg-[#0f172a] rounded-lg p-3 overflow-x-auto leading-relaxed max-h-40 border border-black/10">
               {sandbox.initialOutput || "# Awaiting crash reproduction run..."}
             </pre>
           </div>
 
           {/* After: Passing Test */}
-          <div className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3">
-            <div className="text-xs font-semibold text-slate-300 mb-1 flex items-center justify-between">
-              <span>After Patch (Regression Verification)</span>
-              <span className="text-green-400 font-mono text-[11px]">EXIT 0</span>
+          <div className="glass-card rounded-xl p-4 border border-black/10">
+            <div className="text-xs font-semibold text-slate-900 mb-1.5 flex items-center justify-between">
+              <span>After Patch (Verification Run)</span>
+              <span className="text-emerald-700 font-mono text-[11px] font-semibold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">EXIT 0</span>
             </div>
-            <pre className="text-[11px] font-mono text-slate-200 bg-[#05070d] border border-slate-800 rounded p-2.5 overflow-x-auto leading-relaxed">
-              {sandbox.patchedOutput || "# Awaiting patch test verification..."}
+            <pre className="text-[11px] font-mono text-emerald-300 bg-[#0f172a] rounded-lg p-3 overflow-x-auto leading-relaxed max-h-40 border border-black/10">
+              {sandbox.patchedOutput || "# Awaiting patch synthesis & sandbox verification..."}
             </pre>
           </div>
         </div>
       </div>
 
-      {/* Code Diff Editor Container */}
-      <div className="rounded-xl border border-slate-800/80 bg-[#0c101a]/75 backdrop-blur-md shadow-xs overflow-hidden">
-        <div className="flex items-center justify-between border-b border-slate-800/80 px-5 py-3 bg-[#090c14]/80">
-          <div className="flex items-center gap-2">
-            <FileCode className="h-4 w-4 text-slate-400" />
-            <span className="text-sm font-semibold text-white">
-              Code Patch Diff
-            </span>
-            {patch && (
-              <span className="text-xs font-mono text-slate-300 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded">
-                {patch.filePath}
-              </span>
-            )}
+      {/* Code Diff & Pull Request Section */}
+      {patch ? (
+        <div className="glass-panel rounded-2xl overflow-hidden">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-black/[0.08] px-6 py-4 bg-white/70 backdrop-blur-md gap-3">
+            <div className="flex items-center gap-3">
+              <FileCode className="h-4 w-4 text-slate-700" />
+              <div>
+                <span className="font-mono text-xs font-semibold text-slate-900">{patch.filePath}</span>
+                <span className="ml-3 text-[11px] font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded font-semibold">{patch.diffSummary}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-1.5 font-mono text-xs text-slate-600 bg-black/[0.05] border border-black/10 px-2.5 py-1 rounded-md">
+                <GitBranch className="h-3 w-3" />
+                <span>{patch.branchName}</span>
+              </div>
+
+              {prCreated ? (
+                <a
+                  href={prUrl || "#"}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 px-3.5 py-2 text-xs font-mono font-medium text-white transition-all shadow-sm"
+                >
+                  <Check className="h-3.5 w-3.5" />
+                  <span>PR #{prNumber || 1} Created</span>
+                  <ExternalLink className="h-3 w-3 ml-0.5" />
+                </a>
+              ) : (
+                <button
+                  disabled={isCreatingPR}
+                  onClick={onCreatePR}
+                  className="flex items-center gap-2 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 px-4 py-2 text-xs font-mono font-medium text-white transition-colors cursor-pointer disabled:cursor-not-allowed shadow-sm"
+                >
+                  {isCreatingPR ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <GitPullRequest className="h-3.5 w-3.5" />
+                  )}
+                  <span>{isCreatingPR ? "Submitting PR..." : "Create Pull Request"}</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          {patch && (
-            <button
-              onClick={() => setInlineMode(!inlineMode)}
-              className="text-xs font-medium text-slate-300 hover:text-white px-2.5 py-1 rounded border border-slate-700 bg-slate-900/80 hover:bg-slate-800 transition-colors cursor-pointer"
-            >
-              {inlineMode ? "Split View" : "Inline View"}
-            </button>
-          )}
-        </div>
-
-        <div className="h-[360px] bg-[#05070d]">
-          {patch ? (
+          {/* Monaco Diff Editor */}
+          <div className="h-[480px] w-full bg-[#0f172a]">
             <DiffEditor
+              height="100%"
+              language="python"
               original={patch.originalCode}
               modified={patch.patchedCode}
-              language="python"
               theme="vs-dark"
-              height="100%"
               options={{
                 readOnly: true,
                 renderSideBySide: !inlineMode,
                 minimap: { enabled: false },
                 fontSize: 12,
-                fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+                fontFamily: "JetBrains Mono, Fira Code, monospace",
                 lineNumbers: "on",
-                automaticLayout: true,
-                scrollBeyondLastLine: false
+                scrollBeyondLastLine: false,
+                padding: { top: 12, bottom: 12 }
               }}
             />
-          ) : (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500">
-              <FileCode className="h-8 w-8 text-slate-700 mb-2" />
-              <div className="text-sm font-medium text-slate-300">No patch generated yet</div>
-              <p className="text-xs text-slate-500 mt-1">
-                The synthesized unified diff will appear here after the AI swarm verifies the root cause.
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* PR Action Footer */}
-        <div className="border-t border-slate-800/80 px-5 py-3.5 bg-[#090c14]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
-              <GitBranch className="h-4 w-4 text-slate-500" />
-              <span>Target Branch: <strong className="text-slate-200">{patch ? patch.branchName : "chronos/fix-patch"}</strong></span>
-            </div>
-            <span className="text-[11px] text-slate-400">
-              Opens a Pull Request with verified fix and Pytest regression logs.
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            {prCreated && prUrl && (
-              <a
-                href={prUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-semibold bg-slate-900 text-slate-200 border border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                <span>View PR #{prNumber || 2} on GitHub</span>
-                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
-              </a>
-            )}
-
-            <button
-              onClick={onCreatePR}
-              disabled={!patch || isCreatingPR || prCreated}
-              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                prCreated
-                  ? "bg-green-600 text-white cursor-default"
-                  : patch
-                  ? "bg-blue-600 hover:bg-blue-500 text-white"
-                  : "bg-slate-800 text-slate-500 cursor-not-allowed"
-              }`}
-            >
-              {prCreated ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  <span>Pull Request Created</span>
-                </>
-              ) : isCreatingPR ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Submitting to GitHub...</span>
-                </>
-              ) : (
-                <>
-                  <GitPullRequest className="h-4 w-4" />
-                  <span>Submit Verified GitHub PR</span>
-                </>
-              )}
-            </button>
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="glass-panel rounded-2xl p-12 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-black/[0.05] border border-black/10 text-slate-500 mb-3">
+            <GitPullRequest className="h-6 w-6" />
+          </div>
+          <h3 className="text-base font-semibold text-slate-900">No Patch Synthesized Yet</h3>
+          <p className="text-xs text-slate-600 max-w-md mx-auto mt-1 leading-relaxed">
+            Run an autonomous investigation from the Root Cause Analysis tab. Once the Nemotron reasoning agent validates the fix against the deterministic sandbox, the code diff and automated PR creator will appear here.
+          </p>
+        </div>
+      )}
     </div>
   );
 };

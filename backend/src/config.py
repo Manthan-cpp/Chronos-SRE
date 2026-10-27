@@ -25,7 +25,7 @@ def default_cors():
 class Settings:
     nebius_api_key: str = os.getenv("NEBIUS_API_KEY", "")
     nebius_base_url: str = os.getenv("NEBIUS_BASE_URL", "https://api.studio.nebius.ai/v1/")
-    nemotron_model: str = os.getenv("NEMOTRON_MODEL", "nvidia/llama-3.1-nemotron-70b-instruct")
+    nemotron_model: str = os.getenv("NEMOTRON_MODEL", "nvidia/nemotron-3.5-bolt-e4b")
     
     tavily_api_key: str = os.getenv("TAVILY_API_KEY", "")
     

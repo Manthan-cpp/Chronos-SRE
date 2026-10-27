@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #06070a;
-  --foreground: #f8fafc;
+  --background: #dde1e6;
+  --foreground: #0f172a;
 }
 
 html, body {
-  background-color: #06070a !important;
-  background: #06070a !important;
-  color: #f8fafc !important;
+  background-color: #dde1e6 !important;
+  background: #dde1e6 !important;
+  color: #0f172a !important;
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -20,7 +20,7 @@ html, body {
 /* Lenis Smooth Scroll Rules */
 html.lenis, html.lenis body {
   height: auto;
-  background-color: #06070a !important;
+  background-color: #dde1e6 !important;
 }
 
 .lenis.lenis-smooth {
@@ -39,7 +39,7 @@ html.lenis, html.lenis body {
   pointer-events: none;
 }
 
-/* Clean, Minimal Scrollbar */
+/* Minimal Monochrome Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -50,10 +50,56 @@ html.lenis, html.lenis body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #cbd5e1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: #94a3b8;
+}
+
+/* Minimalist Light Glassmorphism (Strictly Monochrome) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.42);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.glass-card-hover {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-card-hover:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow: 0 6px 18px -2px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.glass-header {
+  background: rgba(221, 225, 230, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.glass-nav-pill {
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
+}
+.glass-nav-pill:hover {
+  background: rgba(255, 255, 255, 0.70);
+  border-color: rgba(0, 0, 0, 0.16);
 }

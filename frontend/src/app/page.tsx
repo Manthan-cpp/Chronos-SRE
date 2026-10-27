@@ -16,6 +16,11 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<TabKey>("overview");
 
   const {
+    connectedRepo,
+    repoInput,
+    setRepoInput,
+    connectRepo,
+    disconnectRepo,
     scenarios,
     activeScenario,
     handleSelectScenario,
@@ -27,8 +32,6 @@ export default function Home() {
     tokenMetrics,
     sandboxExecution,
     patch,
-    repoUrl,
-    setRepoUrl,
     isCreatingPR,
     prCreated,
     prUrl,
@@ -36,8 +39,7 @@ export default function Home() {
     systemStatus,
     triggerSimulation,
     triggerInvestigation,
-    createPullRequest,
-    resetAll
+    createPullRequest
   } = useIncidentStream();
 
   const handleStartInvestigation = () => {
@@ -51,56 +53,59 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full relative font-sans" style={{ backgroundColor: "#06070a", color: "#f8fafc" }}>
-      {/* 1. CursorGrid Wrapper with exact parameters from React Bits configuration */}
+    <div className="min-h-screen w-full relative font-sans" style={{ backgroundColor: "#dde1e6", color: "#0f172a" }}>
+      {/* 1. CursorGrid in Light Mode with Soft Gray Background */}
       <CursorGrid
         cellSize={32}
-        radius={60}
+        radius={120}
         fadeDuration={300}
         holdTime={400}
-        color="#ffffff"
-        gridColor="#ffffff"
+        color="#0f172a"
+        gridColor="#94a3b8"
+        lightMode={true}
         highlight="area"
         gridStyle="lines"
         falloff="smooth"
         lineWidth={1}
-        maxOpacity={1}
-        fillOpacity={0.06}
-        gridOpacity={0.08}
-        spotlight={0.6}
+        maxOpacity={0.5}
+        fillOpacity={0.08}
+        gridOpacity={0.25}
+        spotlight={0.8}
         cellGap={0}
         cellRadius={0}
         pulseSpeed={600}
-        ambient={0}
-        edgeFade={0.2}
+        ambient={0.2}
+        edgeFade={0.15}
         clickPulse={true}
         intro={false}
-        style={{ width: "100%", minHeight: "100vh", position: "relative", backgroundColor: "#06070a" }}
+        style={{ width: "100%", minHeight: "100vh", position: "relative" }}
       >
         {/* 2. Interactive Foreground Layer */}
         <div className="relative z-10 flex flex-col min-h-screen">
-          {/* Navbar */}
+          {/* Minimalist Header */}
           <Navbar
+            connectedRepo={connectedRepo}
+            repoInput={repoInput}
+            onRepoInputChange={setRepoInput}
+            onConnectRepo={connectRepo}
+            onDisconnectRepo={disconnectRepo}
             scenarios={scenarios}
             activeScenario={activeScenario}
             onSelectScenario={handleSelectScenario}
-            repoUrl={repoUrl}
-            onRepoUrlChange={setRepoUrl}
             isInvestigating={isInvestigating}
             systemStatus={systemStatus}
             onTriggerInvestigation={handleStartInvestigation}
-            onReset={resetAll}
           />
 
-          {/* Navigation Tabs */}
-          <div className="border-b border-slate-800/80 bg-[#07090e]/75 backdrop-blur-md sticky top-0 z-40">
+          {/* Navigation Tabs (Minimalist Monochrome) */}
+          <div className="border-b border-black/[0.08] bg-[#dde1e6]/80 backdrop-blur-xl sticky top-[57px] z-40">
             <div className="mx-auto flex max-w-7xl items-center gap-8 px-6">
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`flex items-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                className={`flex items-center gap-2 py-3.5 text-xs font-mono uppercase tracking-wider font-semibold border-b-2 transition-all cursor-pointer ${
                   activeTab === "overview"
-                    ? "border-blue-500 text-blue-400"
-                    : "border-transparent text-slate-400 hover:text-white"
+                    ? "border-slate-900 text-slate-900"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <LayoutDashboard className="h-4 w-4" />
@@ -109,16 +114,16 @@ export default function Home() {
 
               <button
                 onClick={() => setActiveTab("logs")}
-                className={`flex items-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                className={`flex items-center gap-2 py-3.5 text-xs font-mono uppercase tracking-wider font-semibold border-b-2 transition-all cursor-pointer ${
                   activeTab === "logs"
-                    ? "border-blue-500 text-blue-400"
-                    : "border-transparent text-slate-400 hover:text-white"
+                    ? "border-slate-900 text-slate-900"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <Terminal className="h-4 w-4" />
                 <span>Telemetry & Logs</span>
-                {liveLogs.length > 2 && (
-                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-slate-900 border border-slate-800 text-slate-300">
+                {liveLogs.length > 0 && (
+                  <span className="text-[10px] px-1.5 py-0.2 rounded font-mono bg-black/[0.06] border border-black/10 text-slate-700">
                     {liveLogs.length}
                   </span>
                 )}
@@ -126,31 +131,31 @@ export default function Home() {
 
               <button
                 onClick={() => setActiveTab("investigation")}
-                className={`flex items-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                className={`flex items-center gap-2 py-3.5 text-xs font-mono uppercase tracking-wider font-semibold border-b-2 transition-all cursor-pointer ${
                   activeTab === "investigation"
-                    ? "border-blue-500 text-blue-400"
-                    : "border-transparent text-slate-400 hover:text-white"
+                    ? "border-slate-900 text-slate-900"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <SearchCode className="h-4 w-4" />
                 <span>Root Cause Analysis</span>
                 {isInvestigating && (
-                  <span className="h-2 w-2 rounded-full bg-blue-500 animate-pulse" />
+                  <span className="h-2 w-2 rounded-full bg-slate-900 animate-pulse" />
                 )}
               </button>
 
               <button
                 onClick={() => setActiveTab("patch")}
-                className={`flex items-center gap-2 py-3 text-sm font-medium border-b-2 transition-colors cursor-pointer ${
+                className={`flex items-center gap-2 py-3.5 text-xs font-mono uppercase tracking-wider font-semibold border-b-2 transition-all cursor-pointer ${
                   activeTab === "patch"
-                    ? "border-blue-500 text-blue-400"
-                    : "border-transparent text-slate-400 hover:text-white"
+                    ? "border-slate-900 text-slate-900"
+                    : "border-transparent text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <GitPullRequest className="h-4 w-4" />
                 <span>Patch & Sandbox</span>
                 {patch && (
-                  <span className="text-[11px] px-1.5 py-0.2 rounded-full bg-green-950/80 border border-green-800/80 text-green-300 font-semibold">
+                  <span className="text-[10px] px-1.5 py-0.2 rounded font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold">
                     Verified
                   </span>
                 )}
@@ -162,14 +167,17 @@ export default function Home() {
           <main className="flex-1 mx-auto max-w-7xl w-full p-6">
             {activeTab === "overview" && (
               <OverviewTab
+                connectedRepo={connectedRepo}
+                repoInput={repoInput}
+                onRepoInputChange={setRepoInput}
+                onConnectRepo={connectRepo}
                 scenario={activeScenario}
+                scenarios={scenarios}
+                onSelectScenario={handleSelectScenario}
                 systemStatus={systemStatus}
-                repoUrl={repoUrl}
-                onRepoUrlChange={setRepoUrl}
                 isSimulating={isStreamingLogs}
                 isInvestigating={isInvestigating}
                 onSimulate={handleSimulate}
-                onInvestigate={handleStartInvestigation}
                 onNavigateToTab={(tab) => setActiveTab(tab as TabKey)}
               />
             )}

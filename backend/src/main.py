@@ -5,6 +5,7 @@ Provides REST endpoints and real-time Server-Sent Events (SSE) streaming for the
 
 import json
 import asyncio
+import time
 from typing import Dict, Any, Optional
 from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -16,7 +17,7 @@ from backend.src.agents.orchestrator import forensic_orchestrator, VERIFIED_PATC
 from backend.src.services.nebius_client import nebius_client
 from backend.src.services.tavily_search import tavily_service
 from backend.src.services.github_service import github_service
-from scenarios.runner import SCENARIO_MAP, ALIAS_MAP
+from scenarios.runner import SCENARIO_MAP, ALIAS_MAP, run_scenario
 
 app = FastAPI(
     title="Chronos-SRE Backend",
@@ -32,6 +33,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class SimulateRequest(BaseModel):
+    scenarioId: str
+    repoUrl: Optional[str] = None
 
 class TriggerRequest(BaseModel):
     scenarioId: Optional[str] = "ASYNC-DEADLOCK-402"
@@ -54,6 +59,49 @@ async def health_check():
         "nebius_connected": nebius_client.is_configured,
         "tavily_connected": tavily_service.is_configured,
         "github_connected": github_service.is_configured
+    }
+
+@app.post("/api/incident/simulate")
+async def simulate_scenario(req: SimulateRequest):
+    """
+    Executes the real pytest testbed for the scenario using runner.py subprocess.
+    Returns real stdout/stderr, returncode, trace_id, duration_ms, and structured logs.
+    """
+    norm_key = ALIAS_MAP.get(req.scenarioId.lower(), req.scenarioId.upper())
+    if norm_key not in SCENARIO_MAP:
+        return JSONResponse(
+            status_code=400,
+            content={"status": "error", "message": f"Unknown scenario: {req.scenarioId}. Valid: {list(SCENARIO_MAP.keys())}"}
+        )
+    
+    # Run the real pytest subprocess asynchronously
+    loop = asyncio.get_event_loop()
+    result = await loop.run_in_executor(None, run_scenario, norm_key)
+    
+    # Generate timestamped log lines from the real execution
+    now_str = time.strftime("%Y-%m-%d %H:%M:%S")
+    formatted_logs = [
+        f"[{now_str}.012] [INFO] [telemetry.ingress] Target: {result['attributes']['test_target']} ({result['attributes']['runner_runtime']})",
+        f"[{now_str}.105] [INFO] [trace.context] TraceID: {result['trace_id']} SpanID: {result['span_id']} Service: {result['service']} Env: {result['environment']}",
+        f"[{now_str}.250] [WARN] [executor] Executing pytest testbed under production load simulation...",
+    ]
+    
+    # Append real pytest output lines
+    for line in result["raw_output"].splitlines():
+        if "FAILED" in line or "FAILURES" in line:
+            formatted_logs.append(f"[{now_str}.400] [CRITICAL] [pytest] {line}")
+        elif "AssertionError" in line or "Error" in line or "CancelledError" in line:
+            formatted_logs.append(f"[{now_str}.410] [FATAL] [runtime] {line}")
+        elif line.strip():
+            formatted_logs.append(f"[{now_str}.350] [ERROR] [runner] {line}")
+            
+    formatted_logs.append(f"[{now_str}.890] [FATAL] [kernel] Subprocess exited with code {result['return_code']} (Duration: {result['duration_ms']}ms)")
+    
+    return {
+        "status": "success",
+        "scenarioId": norm_key,
+        "result": result,
+        "logs": formatted_logs
     }
 
 @app.post("/api/incident/trigger")

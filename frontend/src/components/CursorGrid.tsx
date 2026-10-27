@@ -198,11 +198,9 @@ void main() {
   fillAlpha *= fade;
 
   float cellAlpha = clamp(max(litAlpha, fillAlpha), 0.0, 1.0);
-  float totalAlpha = clamp(cellAlpha + gridAlpha * (1.0 - cellAlpha), 0.0, 1.0);
-  vec3 bg = vec3(0.023529, 0.027451, 0.039216);
-  vec3 fg = mix(uGridColor, uColor, cellAlpha);
-  vec3 finalColor = mix(bg, fg, totalAlpha);
-  outColor = vec4(finalColor, 1.0);
+  float alpha = cellAlpha + gridAlpha * (1.0 - cellAlpha);
+  vec3 premul = uColor * cellAlpha + uGridColor * gridAlpha * (1.0 - cellAlpha);
+  outColor = vec4(premul, alpha);
 }`;
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
@@ -213,7 +211,6 @@ const compile = (gl: WebGL2RenderingContext, type: number, source: string) => {
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
-  console.error('[CursorGrid Shader Error]:', gl.getShaderInfoLog(shader));
   gl.deleteShader(shader);
   return null;
 };
@@ -229,7 +226,6 @@ const link = (gl: WebGL2RenderingContext): Program | null => {
   gl.deleteShader(vertex);
   gl.deleteShader(fragment);
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    console.error('[CursorGrid Link Error]:', gl.getProgramInfoLog(program));
     gl.deleteProgram(program);
     return null;
   }
@@ -332,7 +328,8 @@ const CursorGrid = ({
     const container = containerRef.current;
     const canvas = canvasRef.current;
     const gl = canvas?.getContext('webgl2', {
-      alpha: false,
+      alpha: true,
+      premultipliedAlpha: true,
       antialias: false,
       depth: false,
       stencil: false
@@ -469,7 +466,7 @@ const CursorGrid = ({
       const s = settingsRef.current;
       const ratio = view.ratio;
       gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.clearColor(0.023529, 0.027451, 0.039216, 1.0);
+      gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.useProgram(shader.program);
       gl.bindVertexArray(vao);
@@ -641,7 +638,7 @@ const CursorGrid = ({
       gl.deleteTexture(stateTexture);
       gl.deleteVertexArray(vao);
       gl.deleteProgram(shader.program);
-      gl.getExtension('WEBGL_lose_context')?.loseContext();
+      // WebGL context preserved across React StrictMode / Fast Refresh re-mounts
     };
   }, []);
 
@@ -655,16 +652,10 @@ const CursorGrid = ({
       className={['relative h-full w-full overflow-hidden', className].filter(Boolean).join(' ')}
       style={style}
     >
-      <canvas
-        ref={canvasRef}
-        className="pointer-events-none absolute inset-0 block h-full w-full"
-        style={{ backgroundColor: '#06070a' }}
-        aria-hidden="true"
-      />
+      <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 block h-full w-full" aria-hidden="true" />
       {children ? <div className="relative h-full w-full">{children}</div> : null}
     </div>
   );
 };
 
 export default CursorGrid;
-
