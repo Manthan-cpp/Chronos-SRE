@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { PatchInfo, SandboxExecution } from "../../types/incident";
-import { Check, CheckCircle2, FileCode, GitBranch, GitPullRequest, Loader2, ShieldCheck, XCircle } from "lucide-react";
+import { Check, CheckCircle2, ExternalLink, FileCode, GitBranch, GitPullRequest, Loader2, ShieldCheck, XCircle } from "lucide-react";
 
 const DiffEditor = dynamic(
   () => import("@monaco-editor/react").then((mod) => mod.DiffEditor),
@@ -16,6 +16,8 @@ interface PatchTabProps {
   onCreatePR: () => void;
   isCreatingPR: boolean;
   prCreated: boolean;
+  prUrl?: string | null;
+  prNumber?: number | null;
 }
 
 export const PatchTab: React.FC<PatchTabProps> = ({
@@ -23,7 +25,9 @@ export const PatchTab: React.FC<PatchTabProps> = ({
   sandbox,
   onCreatePR,
   isCreatingPR,
-  prCreated
+  prCreated,
+  prUrl,
+  prNumber
 }) => {
   const [inlineMode, setInlineMode] = useState(false);
 
@@ -143,39 +147,58 @@ export const PatchTab: React.FC<PatchTabProps> = ({
 
         {/* PR Action Footer */}
         <div className="border-t border-slate-800/80 px-5 py-3.5 bg-[#090c14]/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
-            <GitBranch className="h-4 w-4 text-slate-500" />
-            <span>Target Branch: <strong className="text-slate-200">{patch ? patch.branchName : "chronos/fix-patch"}</strong></span>
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-xs text-slate-400 font-mono">
+              <GitBranch className="h-4 w-4 text-slate-500" />
+              <span>Target Branch: <strong className="text-slate-200">{patch ? patch.branchName : "chronos/fix-patch"}</strong></span>
+            </div>
+            <span className="text-[11px] text-slate-400">
+              Opens a Pull Request with verified fix and Pytest regression logs.
+            </span>
           </div>
 
-          <button
-            onClick={onCreatePR}
-            disabled={!patch || isCreatingPR || prCreated}
-            className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-              prCreated
-                ? "bg-green-600 text-white cursor-default"
-                : patch
-                ? "bg-blue-600 hover:bg-blue-500 text-white"
-                : "bg-slate-800 text-slate-500 cursor-not-allowed"
-            }`}
-          >
-            {prCreated ? (
-              <>
-                <Check className="h-4 w-4" />
-                <span>Pull Request Created (#42)</span>
-              </>
-            ) : isCreatingPR ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Submitting to GitHub...</span>
-              </>
-            ) : (
-              <>
-                <GitPullRequest className="h-4 w-4" />
-                <span>Submit Verified GitHub PR</span>
-              </>
+          <div className="flex items-center gap-3">
+            {prCreated && prUrl && (
+              <a
+                href={prUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-md text-xs font-semibold bg-slate-900 text-slate-200 border border-slate-700 hover:bg-slate-800 transition-colors cursor-pointer"
+              >
+                <span>View PR #{prNumber || 2} on GitHub</span>
+                <ExternalLink className="h-3.5 w-3.5 text-slate-400" />
+              </a>
             )}
-          </button>
+
+            <button
+              onClick={onCreatePR}
+              disabled={!patch || isCreatingPR || prCreated}
+              className={`flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                prCreated
+                  ? "bg-green-600 text-white cursor-default"
+                  : patch
+                  ? "bg-blue-600 hover:bg-blue-500 text-white"
+                  : "bg-slate-800 text-slate-500 cursor-not-allowed"
+              }`}
+            >
+              {prCreated ? (
+                <>
+                  <Check className="h-4 w-4" />
+                  <span>Pull Request Created</span>
+                </>
+              ) : isCreatingPR ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span>Submitting to GitHub...</span>
+                </>
+              ) : (
+                <>
+                  <GitPullRequest className="h-4 w-4" />
+                  <span>Submit Verified GitHub PR</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

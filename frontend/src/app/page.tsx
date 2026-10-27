@@ -31,6 +31,8 @@ export default function Home() {
     setRepoUrl,
     isCreatingPR,
     prCreated,
+    prUrl,
+    prNumber,
     systemStatus,
     triggerSimulation,
     triggerInvestigation,
@@ -196,6 +198,8 @@ export default function Home() {
                 onCreatePR={createPullRequest}
                 isCreatingPR={isCreatingPR}
                 prCreated={prCreated}
+                prUrl={prUrl}
+                prNumber={prNumber}
               />
             )}
           </main>

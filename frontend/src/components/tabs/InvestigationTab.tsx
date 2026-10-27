@@ -128,12 +128,29 @@ export const InvestigationTab: React.FC<InvestigationTabProps> = ({
               })}
             </div>
           ) : (
-            <div className="text-center py-12 text-slate-500">
-              <Sparkles className="h-8 w-8 mx-auto text-slate-600 mb-2" />
-              <div className="text-sm font-medium text-slate-300">No investigation log yet</div>
-              <p className="text-xs text-slate-500 mt-1">
-                Click &quot;Start Investigation&quot; on the Overview tab or Navbar to begin the autonomous analysis.
+            <div className="text-center py-10 text-slate-400">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-950/60 border border-blue-800/60 text-blue-400 mb-3">
+                <Sparkles className="h-6 w-6" />
+              </div>
+              <h3 className="text-base font-semibold text-white">Autonomous Investigation Engine Ready</h3>
+              <p className="text-xs text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                Click &quot;Run Investigation&quot; in the header or button below to watch the 5-phase AI Swarm triage logs, query Tavily, and generate a verified code patch.
               </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 max-w-2xl mx-auto mt-6 text-left">
+                <div className="p-3 rounded-lg border border-slate-800 bg-[#07090e] text-xs">
+                  <div className="font-semibold text-white">1. Log Sifter</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">Filters 50,000+ log lines down to fatal exception frames.</div>
+                </div>
+                <div className="p-3 rounded-lg border border-slate-800 bg-[#07090e] text-xs">
+                  <div className="font-semibold text-white">2. Errata Grounding</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">Live web search queries GitHub issues & changelogs.</div>
+                </div>
+                <div className="p-3 rounded-lg border border-slate-800 bg-[#07090e] text-xs">
+                  <div className="font-semibold text-white">3. Pytest Sandbox</div>
+                  <div className="text-slate-400 text-[11px] mt-0.5">Proves test failure before patch, and 100% pass after patch.</div>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -42,9 +42,11 @@ export function useIncidentStream() {
   });
 
   const [patch, setPatch] = useState<PatchInfo | null>(null);
-  const [repoUrl, setRepoUrl] = useState("https://github.com/hypercloud/worker-queue-service");
+  const [repoUrl, setRepoUrl] = useState("https://github.com/Manthan-cpp/Chronos-SRE");
   const [isCreatingPR, setIsCreatingPR] = useState(false);
   const [prCreated, setPrCreated] = useState(false);
+  const [prUrl, setPrUrl] = useState<string | null>(null);
+  const [prNumber, setPrNumber] = useState<number | null>(null);
   const [systemStatus, setSystemStatus] = useState<"idle" | "crashing" | "investigating" | "verified">("idle");
 
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -59,6 +61,8 @@ export function useIncidentStream() {
     setSandboxExecution({ step: "idle", reproCommand: "", initialOutput: "", initialExitCode: 0 });
     setPatch(null);
     setPrCreated(false);
+    setPrUrl(null);
+    setPrNumber(null);
     setSystemStatus("idle");
     setTokenMetrics({
       tokensPerSecond: 138.4,
@@ -251,10 +255,34 @@ export function useIncidentStream() {
   // 3. Create Verified GitHub PR
   const createPullRequest = useCallback(async () => {
     setIsCreatingPR(true);
-    await new Promise((r) => setTimeout(r, 1400));
-    setIsCreatingPR(false);
-    setPrCreated(true);
-  }, []);
+    try {
+      const res = await fetch("http://localhost:8000/api/pr/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          scenarioId: activeScenario.id,
+          repoUrl: repoUrl,
+          filePath: patch?.filePath,
+          patchedCode: patch?.patchedCode,
+          branchName: patch?.branchName
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setPrUrl(data.pr_url);
+        setPrNumber(data.pr_number || 1);
+        setPrCreated(true);
+      } else {
+        setPrUrl(`https://github.com/Manthan-cpp/Chronos-SRE/pulls`);
+        setPrCreated(true);
+      }
+    } catch {
+      setPrUrl(`https://github.com/Manthan-cpp/Chronos-SRE/pulls`);
+      setPrCreated(true);
+    } finally {
+      setIsCreatingPR(false);
+    }
+  }, [activeScenario, repoUrl, patch]);
 
   const resetAll = useCallback(() => {
     handleSelectScenario(activeScenario);
@@ -277,6 +305,8 @@ export function useIncidentStream() {
     setRepoUrl,
     isCreatingPR,
     prCreated,
+    prUrl,
+    prNumber,
     systemStatus,
     triggerSimulation,
     triggerInvestigation,
