@@ -42,13 +42,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         {/* Brand & Inputs */}
         <div className="flex items-center gap-5">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold text-lg tracking-tight text-slate-900">
-              Chronos
-            </span>
-            <span className="text-[10px] font-mono font-medium text-slate-700 bg-black/[0.05] border border-black/10 px-1.5 py-0.5 rounded">
-              SRE
-            </span>
+          <div className="flex items-center gap-3">
+            <img
+              src="/logo.png"
+              alt="Chronos SRE Logo"
+              className="h-10 w-10 object-contain shrink-0 select-none"
+            />
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-2xl tracking-tight text-slate-900 font-sans">
+                Chronos
+              </span>
+              <span className="text-[11px] font-mono font-bold tracking-widest text-white bg-slate-900 px-2 py-0.5 rounded shadow-xs uppercase">
+                SRE
+              </span>
+            </div>
           </div>
 
           <div className="h-4 w-px bg-black/10" />
@@ -147,12 +154,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             </span>
           )}
           {systemStatus === "crashing" && (
-            <span className="text-xs font-mono font-medium text-red-700 bg-red-100 border border-red-300 px-2.5 py-1 rounded-md">
+            <span className="text-xs font-mono font-bold text-white bg-slate-900 border border-slate-700 px-2.5 py-1 rounded-md shadow-2xs">
               Crash Active
             </span>
           )}
           {systemStatus === "investigating" && (
-            <span className="text-xs font-mono font-medium text-blue-700 bg-blue-100 border border-blue-300 px-2.5 py-1 rounded-md">
+            <span className="text-xs font-mono font-semibold text-slate-800 bg-slate-200 border border-slate-300 px-2.5 py-1 rounded-md animate-pulse">
               Investigating...
             </span>
           )}

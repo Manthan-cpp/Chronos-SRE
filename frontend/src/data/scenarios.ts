@@ -30,6 +30,66 @@ export const PRESET_SCENARIOS: IncidentScenario[] = [
       author: "alex.kumar@hypercloud.io",
       message: "perf: parallelize priority queue batch dispatch with dual mutex locks",
       timestamp: "18 minutes ago"
+    },
+    diagnosticReport: {
+      whatHappened: "High-priority batch jobs in the background worker pool froze completely during peak traffic. All 16 async worker tasks stopped responding to liveness health checks, triggering an automatic SIGABRT container crash and leaving the task queue stalled.",
+      whyItHappened: "A classic circular mutex deadlock occurred between two asynchronous processing pipelines. Pipeline Alpha acquired Lock A and waited for Lock B to become free. Simultaneously, Pipeline Beta acquired Lock B and waited for Lock A. Because neither pipeline released its acquired lock and neither specified a timeout, both worker coroutines blocked each other permanently, starving all subsequent requests.",
+      impactedServices: [
+        {
+          name: "worker-queue-service",
+          role: "Background Async Task Execution",
+          status: "CRITICAL",
+          latency: "12,890ms (Timed Out)"
+        },
+        {
+          name: "order-orchestrator",
+          role: "Upstream Microservice Coordinator",
+          status: "DEGRADED",
+          latency: "5,020ms (HTTP 504)"
+        },
+        {
+          name: "notification-relay",
+          role: "Customer Event Dispatcher",
+          status: "DEGRADED",
+          latency: "3,400ms (High Queue Lag)"
+        }
+      ],
+      businessImpact: {
+        severity: "P0 • Production Outage",
+        throughputImpact: "100% batch ingestion stalled (~4,800 events/min dropped)",
+        slaBreachRisk: "Immediate 99.9% availability SLA violation",
+        financialRisk: "Estimated $3,500/min in delayed fulfillment"
+      }
+    },
+    fixReport: {
+      summary: "Enforces strict global lock ordering (Lock Alpha must ALWAYS be acquired before Lock Beta across all code paths) to mathematically eliminate the circular dependency condition.",
+      architecturalStrategy: "Global Deterministic Lock Hierarchy",
+      steps: [
+        {
+          phase: "Phase 1",
+          title: "Forensic Root Cause Pinpointed",
+          description: "Nemotron AST engine isolated scenarios/async_deadlock/worker.py lines 32-35. Inverted lock acquisition (acquiring Lock Beta followed by Lock Alpha) was identified as the catalyst for the circular deadlock.",
+          badge: "AST Verified"
+        },
+        {
+          phase: "Phase 2",
+          title: "Code Architecture Mutation",
+          description: "Mutated process_pipeline_beta to acquire Lock Alpha FIRST, and then Lock Beta. This guarantees both pipelines request shared resources in an identical deterministic order, making deadlocks impossible.",
+          badge: "Safe AST Transform"
+        },
+        {
+          phase: "Phase 3",
+          title: "Deterministic Sandbox Verification",
+          description: "Executed pytest under a 50-coroutine concurrent load simulation. Pre-patch test confirmed deadlocks (EXIT 1 • Bug Confirmed). Post-patch test completed 1,000 batch operations in 0.08s with zero deadlocks (EXIT 0 • Fix Verified).",
+          badge: "EXIT 0 Verified"
+        },
+        {
+          phase: "Phase 4",
+          title: "Automated PR & Safe Rollout",
+          description: "Generated pull request on branch fix/nemotron-async-deadlock-402. Zero schema or database migrations required; safe for immediate blue/green rollout with zero downtime.",
+          badge: "PR Ready"
+        }
+      ]
     }
   },
   {
@@ -59,6 +119,66 @@ export const PRESET_SCENARIOS: IncidentScenario[] = [
       author: "sarah.chen@finops.io",
       message: "chore(deps): bump httpx-upstream from 2.8.4 to 3.0.1",
       timestamp: "45 minutes ago"
+    },
+    diagnosticReport: {
+      whatHappened: "Outbound payment settlement calls immediately failed with HTTP 500 errors right after an automated scheduled dependency bump of the third-party HTTP client library.",
+      whyItHappened: "The upstream library released breaking major version 3.0.0, which renamed the constructor parameter 'strict_mode=True' to 'validation_level=\"strict\"'. When the payment relay tried to initiate an outbound request, Python raised an unhandled TypeError: __init__() got an unexpected keyword argument.",
+      impactedServices: [
+        {
+          name: "payment-gateway-relay",
+          role: "Outbound Merchant Settlement API",
+          status: "CRITICAL",
+          latency: "412ms (HTTP 500)"
+        },
+        {
+          name: "checkout-orchestrator",
+          role: "Core Checkout Flow Service",
+          status: "CRITICAL",
+          latency: "580ms (Failed Transactions)"
+        },
+        {
+          name: "accounting-sync",
+          role: "Financial Ledger Sync Pipeline",
+          status: "DEGRADED",
+          latency: "1,200ms (High Retry Volume)"
+        }
+      ],
+      businessImpact: {
+        severity: "P0 • Payment Processing Blocked",
+        throughputImpact: "48 settlement transactions failing every 3 seconds",
+        slaBreachRisk: "Severe violation of core payment reliability SLA",
+        financialRisk: "Immediate merchant transaction revenue blockage"
+      }
+    },
+    fixReport: {
+      summary: "Upgraded the HTTP client initialization to use modern 'validation_level=\"strict\"' parameter syntax, restoring SSL verification and outbound HTTP connectivity.",
+      architecturalStrategy: "Upstream Schema Harmonization",
+      steps: [
+        {
+          phase: "Phase 1",
+          title: "Tavily Scout Changelog Discovery",
+          description: "Autonomous Tavily agent retrieved the official v3.0.0 release notes from GitHub, confirming that strict_mode was deprecated in v2.9 and removed in v3.0.0.",
+          badge: "Tavily Grounded"
+        },
+        {
+          phase: "Phase 2",
+          title: "Code Syntax Modernization",
+          description: "Replaced deprecated strict_mode=True with validation_level=\"strict\" in scenarios/upstream_break/client.py, maintaining strict SSL validation.",
+          badge: "Clean Patch"
+        },
+        {
+          phase: "Phase 3",
+          title: "Deterministic Sandbox Verification",
+          description: "Ran mock payment gateway integration suite. Pre-patch test reproduced runtime crash (EXIT 1 • Bug Confirmed). Post-patch test verified successful TLS handshake and valid settlement response (EXIT 0 • Fix Verified).",
+          badge: "EXIT 0 Verified"
+        },
+        {
+          phase: "Phase 4",
+          title: "Automated PR & Safe Rollout",
+          description: "Generated pull request on branch fix/nemotron-upstream-break-501 with dependency pin. Safe for immediate canary deployment.",
+          badge: "PR Ready"
+        }
+      ]
     }
   },
   {
@@ -88,6 +208,66 @@ export const PRESET_SCENARIOS: IncidentScenario[] = [
       author: "marcus.vance@ledgertech.com",
       message: "refactor: custom error interceptor for ledger mutations",
       timestamp: "2 hours ago"
+    },
+    diagnosticReport: {
+      whatHappened: "The User Ledger API degraded severely during a traffic surge, returning HTTP 503 errors and timing out after 5,000ms. Database CPU was healthy, but no new queries could execute.",
+      whyItHappened: "Database sessions created for ledger operations were never returned to the connection pool when an unexpected validation exception occurred. While the transaction was rolled back, the underlying connection remained checked out, eventually exhausting the pool limit of 20 connections.",
+      impactedServices: [
+        {
+          name: "user-ledger-api",
+          role: "Core Financial Balance Service",
+          status: "CRITICAL",
+          latency: "5,040ms (Timeout)"
+        },
+        {
+          name: "balance-query-service",
+          role: "Read-Side Ledger Queries",
+          status: "DEGRADED",
+          latency: "4,890ms (Queued Requests)"
+        },
+        {
+          name: "audit-worker",
+          role: "Ledger Consistency Validator",
+          status: "HEALTHY",
+          latency: "14ms (Isolated Pool)"
+        }
+      ],
+      businessImpact: {
+        severity: "P1 • Service Starvation",
+        throughputImpact: "Pool starved: 100% of mutation traffic rejected",
+        slaBreachRisk: "API p99 latency breached > 5,000ms",
+        financialRisk: "Ledger transaction timeouts causing repeated client retries"
+      }
+    },
+    fixReport: {
+      summary: "Refactored session lifecycle to use an async context manager with guaranteed cleanup, ensuring every checked-out connection is returned to the pool even during errors.",
+      architecturalStrategy: "Deterministic RAII Resource Cleanup",
+      steps: [
+        {
+          phase: "Phase 1",
+          title: "Connection Leak Audit",
+          description: "Identified that exception catch blocks in src/database/session_manager.py called rollback() without an enclosing finally: await session.close().",
+          badge: "AST Verified"
+        },
+        {
+          phase: "Phase 2",
+          title: "Async Context Manager Pattern",
+          description: "Wrapped the session scope in an async generator context manager (async with get_session()), ensuring automatic release regardless of execution outcome.",
+          badge: "Safe Refactor"
+        },
+        {
+          phase: "Phase 3",
+          title: "Deterministic Sandbox Verification",
+          description: "Ran pool stress test simulating 100 consecutive transaction errors. Pre-patch test ran out of connections and timed out (EXIT 1 • Bug Confirmed). Post-patch test recycled all 20 connections successfully (EXIT 0 • Fix Verified).",
+          badge: "EXIT 0 Verified"
+        },
+        {
+          phase: "Phase 4",
+          title: "Automated PR & Safe Rollout",
+          description: "Generated pull request on branch fix/nemotron-pool-leak-503. Verified zero connection leaks under 500 QPS burst.",
+          badge: "PR Ready"
+        }
+      ]
     }
   }
 ];

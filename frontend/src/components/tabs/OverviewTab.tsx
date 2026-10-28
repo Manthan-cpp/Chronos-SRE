@@ -132,12 +132,29 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
                   <span>Target: scenarios/{scenario.id}</span>
                 </span>
               </div>
-              <h1 className="text-xl font-semibold tracking-tight text-slate-900 mb-2">
+              <h1 className="text-xl font-bold tracking-tight text-slate-900 mb-2">
                 {scenario.title}
               </h1>
-              <p className="text-xs text-slate-600 max-w-2xl leading-relaxed">
-                {scenario.description}
+              <p className="text-xs text-slate-700 max-w-2xl leading-relaxed mb-3">
+                {scenario.diagnosticReport?.whatHappened || scenario.description}
               </p>
+
+              {scenario.diagnosticReport && (
+                <div className="mt-3 pt-3 border-t border-black/[0.08] space-y-1.5 text-xs text-slate-700">
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-semibold text-slate-900 shrink-0">• Severity &amp; Issue:</span>
+                    <span>{scenario.diagnosticReport.businessImpact.severity}</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-semibold text-slate-900 shrink-0">• Production Impact:</span>
+                    <span>{scenario.diagnosticReport.businessImpact.throughputImpact}</span>
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="font-semibold text-slate-900 shrink-0">• SLA Risk:</span>
+                    <span>{scenario.diagnosticReport.businessImpact.slaBreachRisk}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-3 shrink-0">

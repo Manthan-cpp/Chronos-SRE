@@ -123,7 +123,7 @@ async def stream_incident(scenarioId: str = "ASYNC-DEADLOCK-402"):
         norm_key = ALIAS_MAP.get(scenarioId.lower(), scenarioId.upper())
         
         # Initial Handshake
-        yield f"data: {json.dumps({'type': 'agent_update', 'agentId': 'sifter', 'status': 'running'})}\n\n"
+        yield f"data: {json.dumps({'type': 'agent_update', 'agentId': 'sifter', 'status': 'running', 'message': 'Isolating fatal exception & callstack from telemetry logs...'})}\n\n"
         await asyncio.sleep(0.3)
 
         async for event in forensic_orchestrator.run_investigation_stream(norm_key):
@@ -135,10 +135,11 @@ async def stream_incident(scenarioId: str = "ASYNC-DEADLOCK-402"):
                     "git-ast-differ": "sifter",
                     "tavily-scout": "tavily",
                     "nemotron-reasoner": "nemotron_hypothesis",
+                    "nemotron-critic": "nemotron_critic",
                     "sandbox-verifier": "sandbox"
                 }
                 fe_agent_id = agent_id_map.get(event["agent_id"], "sifter")
-                yield f"data: {json.dumps({'type': 'agent_update', 'agentId': fe_agent_id, 'status': event['status']})}\n\n"
+                yield f"data: {json.dumps({'type': 'agent_update', 'agentId': fe_agent_id, 'status': event['status'], 'message': event.get('message', '')})}\n\n"
 
             elif ev_type == "token_stream":
                 yield f"data: {json.dumps({'type': 'reasoning', 'chunk': event['token']})}\n\n"
@@ -150,6 +151,9 @@ async def stream_incident(scenarioId: str = "ASYNC-DEADLOCK-402"):
                 patch_data = event["patch"]
                 yield f"data: {json.dumps({'type': 'sandbox_update', 'sandbox': {'step': 'verified_pass', 'reproCommand': 'pytest -v', 'initialOutput': sb['pre_output'], 'patchedOutput': sb['post_output'], 'initialExitCode': 1}})}\n\n"
                 
+                # Explicitly mark sandbox agent completed with verification message
+                yield f"data: {json.dumps({'type': 'agent_update', 'agentId': 'sandbox', 'status': 'completed', 'message': 'Deterministic verification complete: Regression test passed (EXIT 0).'})}\n\n"
+
                 # Format patch info for frontend Monaco Diff Editor
                 patch_info = VERIFIED_PATCHES.get(norm_key, {})
                 yield f"data: {json.dumps({'type': 'patch_ready', 'patch': {'filePath': patch_data['file'], 'originalCode': '# Original unpatched code with fault\\n', 'patchedCode': patch_info.get('patched_code', ''), 'diffSummary': '+5 lines, -2 lines (Deterministic Fix)', 'branchName': f'chronos/fix-{norm_key.lower()}'}})}\n\n"

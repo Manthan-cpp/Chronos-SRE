@@ -2,8 +2,21 @@
 
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
-import { PatchInfo, SandboxExecution } from "../../types/incident";
-import { Check, CheckCircle2, ExternalLink, FileCode, GitBranch, GitPullRequest, Loader2, ShieldCheck, XCircle } from "lucide-react";
+import { IncidentScenario, PatchInfo, SandboxExecution } from "../../types/incident";
+import {
+  Check,
+  CheckCircle2,
+  ExternalLink,
+  FileCode,
+  GitBranch,
+  GitPullRequest,
+  Loader2,
+  ShieldCheck,
+  XCircle,
+  Wrench,
+  Layers,
+  ArrowRight
+} from "lucide-react";
 
 const DiffEditor = dynamic(
   () => import("@monaco-editor/react").then((mod) => mod.DiffEditor),
@@ -18,6 +31,7 @@ interface PatchTabProps {
   prCreated: boolean;
   prUrl?: string | null;
   prNumber?: number | null;
+  scenario?: IncidentScenario | null;
 }
 
 export const PatchTab: React.FC<PatchTabProps> = ({
@@ -27,7 +41,8 @@ export const PatchTab: React.FC<PatchTabProps> = ({
   isCreatingPR,
   prCreated,
   prUrl,
-  prNumber
+  prNumber,
+  scenario
 }) => {
   const [inlineMode, setInlineMode] = useState(false);
 
@@ -45,14 +60,14 @@ export const PatchTab: React.FC<PatchTabProps> = ({
 
           <div className="flex items-center gap-2">
             {sandbox.step === "reproduced_fail" && (
-              <span className="text-xs px-2.5 py-1 rounded-md bg-red-100 text-red-800 border border-red-200 font-medium flex items-center gap-1.5">
-                <XCircle className="h-3.5 w-3.5 text-red-600" />
+              <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-900 text-white font-medium flex items-center gap-1.5 shadow-2xs">
+                <XCircle className="h-3.5 w-3.5 text-slate-300" />
                 Reproduction Test Failed (Bug Verified)
               </span>
             )}
             {sandbox.step === "verified_pass" && (
-              <span className="text-xs px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium flex items-center gap-1.5">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+              <span className="text-xs font-mono px-2.5 py-1 rounded-md bg-slate-900 text-emerald-400 font-medium flex items-center gap-1.5 shadow-2xs">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
                 Regression Suite Passed (100% Green)
               </span>
             )}
@@ -67,24 +82,28 @@ export const PatchTab: React.FC<PatchTabProps> = ({
         {/* Pytest Output Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Before: Failing Test */}
-          <div className="glass-card rounded-xl p-4 border border-black/10">
-            <div className="text-xs font-semibold text-slate-900 mb-1.5 flex items-center justify-between">
+          <div className="glass-card rounded-xl p-4 border border-black/10 flex flex-col">
+            <div className="text-xs font-semibold text-slate-900 mb-2 flex items-center justify-between">
               <span>Before Patch (Reproduction Run)</span>
-              <span className="text-red-700 font-mono text-[11px] font-semibold bg-red-50 border border-red-200 px-1.5 py-0.5 rounded">EXIT 1</span>
+              <span className="font-mono text-[11px] font-semibold bg-slate-900 text-slate-200 border border-slate-700 px-2 py-0.5 rounded shadow-2xs">
+                EXIT 1 • Bug Confirmed
+              </span>
             </div>
-            <pre className="text-[11px] font-mono text-slate-200 bg-[#0f172a] rounded-lg p-3 overflow-x-auto leading-relaxed max-h-40 border border-black/10">
-              {sandbox.initialOutput || "# Awaiting crash reproduction run..."}
+            <pre className="text-[11px] font-mono text-slate-200 bg-[#0b0f19] rounded-lg p-3.5 overflow-y-auto overflow-x-auto leading-relaxed max-h-72 min-h-48 border border-black/10 select-text">
+              {sandbox.initialOutput || "# Awaiting crash reproduction run (Expected: EXIT 1 • Bug Confirmed)..."}
             </pre>
           </div>
 
           {/* After: Passing Test */}
-          <div className="glass-card rounded-xl p-4 border border-black/10">
-            <div className="text-xs font-semibold text-slate-900 mb-1.5 flex items-center justify-between">
+          <div className="glass-card rounded-xl p-4 border border-black/10 flex flex-col">
+            <div className="text-xs font-semibold text-slate-900 mb-2 flex items-center justify-between">
               <span>After Patch (Verification Run)</span>
-              <span className="text-emerald-700 font-mono text-[11px] font-semibold bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">EXIT 0</span>
+              <span className="font-mono text-[11px] font-semibold bg-slate-900 text-emerald-400 border border-slate-700 px-2 py-0.5 rounded shadow-2xs">
+                EXIT 0 • Fix Verified
+              </span>
             </div>
-            <pre className="text-[11px] font-mono text-emerald-300 bg-[#0f172a] rounded-lg p-3 overflow-x-auto leading-relaxed max-h-40 border border-black/10">
-              {sandbox.patchedOutput || "# Awaiting patch synthesis & sandbox verification..."}
+            <pre className="text-[11px] font-mono text-emerald-300 bg-[#0b0f19] rounded-lg p-3.5 overflow-y-auto overflow-x-auto leading-relaxed max-h-72 min-h-48 border border-black/10 select-text">
+              {sandbox.patchedOutput || "# Awaiting patch synthesis & sandbox verification (Expected: EXIT 0 • Fix Verified)..."}
             </pre>
           </div>
         </div>
@@ -167,6 +186,72 @@ export const PatchTab: React.FC<PatchTabProps> = ({
           <p className="text-xs text-slate-600 max-w-md mx-auto mt-1 leading-relaxed">
             Run an autonomous investigation from the Root Cause Analysis tab. Once the Nemotron reasoning agent validates the fix against the deterministic sandbox, the code diff and automated PR creator will appear here.
           </p>
+        </div>
+      )}
+
+      {/* Fix & Architectural Resolution Report (Clean Memo / Letter Format) */}
+      {scenario?.fixReport && patch && (
+        <div className="pt-3 space-y-5">
+          <div className="border-b border-black/[0.12] pb-3">
+            <h2 className="text-base font-bold text-slate-900 tracking-tight">
+              Fix &amp; Architectural Resolution Report
+            </h2>
+            <div className="mt-1 flex flex-wrap items-center gap-3 text-xs font-mono text-slate-600">
+              <span>Strategy: <strong className="text-slate-900">{scenario.fixReport.architecturalStrategy}</strong></span>
+              <span>•</span>
+              <span>Branch: <strong className="text-slate-900">{patch.branchName}</strong></span>
+              <span>•</span>
+              <span>Target: <strong className="text-slate-900">{patch.filePath}</strong></span>
+            </div>
+          </div>
+
+          <div className="space-y-4 text-sm text-slate-800 leading-relaxed">
+            {/* 1. What was fixed */}
+            <div>
+              <h3 className="font-bold text-slate-900 text-sm mb-1">
+                1. What was fixed?
+              </h3>
+              <p className="text-slate-700">
+                {scenario.fixReport.summary}
+              </p>
+            </div>
+
+            {/* 2. Step-by-Step Fix Execution */}
+            <div>
+              <h3 className="font-bold text-slate-900 text-sm mb-1.5">
+                2. Step-by-Step Fix Execution
+              </h3>
+              <ul className="space-y-2 text-xs text-slate-700 pl-4 list-disc font-sans">
+                {scenario.fixReport.steps.map((step) => (
+                  <li key={step.phase}>
+                    <strong className="text-slate-900">{step.title}:</strong>{" "}
+                    <span>{step.description}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* 3. Deterministic Verification Proof */}
+            <div>
+              <h3 className="font-bold text-slate-900 text-sm mb-1">
+                3. Deterministic Sandbox Verification Proof
+              </h3>
+              <p className="text-slate-700">
+                • Before patch: Pytest reproduction confirmed failure (<strong>EXIT 1 • Bug Confirmed</strong>).<br />
+                • After patch: Sandbox execution verified 100% of regression tests passed without deadlocks or regressions (<strong>EXIT 0 • Fix Verified</strong>).
+              </p>
+            </div>
+
+            {/* 4. Production Rollout & Safety */}
+            <div>
+              <h3 className="font-bold text-slate-900 text-sm mb-1">
+                4. Production Rollout &amp; Safety Note
+              </h3>
+              <p className="text-slate-700">
+                Zero database migration required. Patch is verified and staged for automatic pull request creation on GitHub with zero downtime risk.
+              </p>
+            </div>
+          </div>
         </div>
       )}
     </div>

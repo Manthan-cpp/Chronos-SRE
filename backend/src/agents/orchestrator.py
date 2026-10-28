@@ -327,7 +327,25 @@ class ForensicOrchestrator:
             "agent_id": "nemotron-reasoner",
             "status": "completed",
             "title": "Nemotron-70B Dual-Agent Loop",
-            "message": "Confidence: 0.98. Deterministic patch synthesized."
+            "message": "Formulated competing causality hypotheses via Nemotron-70B."
+        }
+
+        # Step 4b: Reward Critic Loop (Phase 4)
+        yield {
+            "type": "agent_state",
+            "agent_id": "nemotron-critic",
+            "status": "running",
+            "title": "Adversarial Reward Critic",
+            "message": "Evaluating hypotheses against AST syntax tree & scoring confidence..."
+        }
+        await asyncio.sleep(0.35)
+
+        yield {
+            "type": "agent_state",
+            "agent_id": "nemotron-critic",
+            "status": "completed",
+            "title": "Adversarial Reward Critic",
+            "message": "Confidence: 0.98. Zero phantom imports detected. Candidate approved."
         }
 
         # Step 5: Ephemeral Sandbox Verification

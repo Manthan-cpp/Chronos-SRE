@@ -17,28 +17,6 @@ html, body {
   overflow-x: hidden;
 }
 
-/* Lenis Smooth Scroll Rules */
-html.lenis, html.lenis body {
-  height: auto;
-  background-color: #dde1e6 !important;
-}
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
-}
-
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
-}
-
 /* Minimal Monochrome Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
@@ -102,4 +80,15 @@ html.lenis, html.lenis body {
 .glass-nav-pill:hover {
   background: rgba(255, 255, 255, 0.70);
   border-color: rgba(0, 0, 0, 0.16);
+}
+
+/* Hide Next.js Development Indicator Badges & Toasts */
+nextjs-portal,
+[data-nextjs-dev-overlay],
+[data-nextjs-toast],
+#__next-build-watcher {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }

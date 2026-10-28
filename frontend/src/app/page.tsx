@@ -28,6 +28,7 @@ export default function Home() {
     isStreamingLogs,
     isInvestigating,
     agents,
+    activePhaseMessage,
     reasoningText,
     tokenMetrics,
     sandboxExecution,
@@ -155,7 +156,7 @@ export default function Home() {
                 <GitPullRequest className="h-4 w-4" />
                 <span>Patch & Sandbox</span>
                 {patch && (
-                  <span className="text-[10px] px-1.5 py-0.2 rounded font-mono bg-emerald-100 text-emerald-800 border border-emerald-300 font-semibold">
+                  <span className="text-[10px] px-1.5 py-0.2 rounded font-mono bg-slate-900 text-emerald-400 border border-slate-700 font-semibold">
                     Verified
                   </span>
                 )}
@@ -193,9 +194,11 @@ export default function Home() {
             {activeTab === "investigation" && (
               <InvestigationTab
                 agents={agents}
+                activePhaseMessage={activePhaseMessage}
                 reasoningText={reasoningText}
                 isInvestigating={isInvestigating}
                 tokenMetrics={tokenMetrics}
+                scenario={activeScenario}
               />
             )}
 
@@ -208,6 +211,7 @@ export default function Home() {
                 prCreated={prCreated}
                 prUrl={prUrl}
                 prNumber={prNumber}
+                scenario={activeScenario}
               />
             )}
           </main>

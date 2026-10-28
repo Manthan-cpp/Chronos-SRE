@@ -11,11 +11,11 @@ import {
 import { PRESET_SCENARIOS } from "../data/scenarios";
 
 const INITIAL_AGENTS: AgentNode[] = [
-  { id: "sifter", label: "Log & Trace Sifter", role: "Anomaly Filter", status: "idle", badge: "Filter" },
-  { id: "tavily", label: "Tavily Errata Scout", role: "Live Web & GitHub", status: "idle", badge: "Tavily" },
-  { id: "nemotron_hypothesis", label: "Nemotron Reasoner", role: "Causality Formulation", status: "idle", badge: "Nemotron" },
-  { id: "nemotron_critic", label: "Reward Critic Loop", role: "Hallucination Filter", status: "idle", badge: "Critique" },
-  { id: "sandbox", label: "Ephemeral Sandbox", role: "Deterministic Pytest", status: "idle", badge: "Sandbox" }
+  { id: "sifter", label: "Log & Trace Sifter", role: "Anomaly Filter", status: "idle", badge: "Filter", message: "Isolating fatal exception & callstack from telemetry logs..." },
+  { id: "tavily", label: "Tavily Errata Scout", role: "Live Web & GitHub", status: "idle", badge: "Tavily", message: "Searching upstream changelogs & GitHub issues..." },
+  { id: "nemotron_hypothesis", label: "Nemotron Reasoner", role: "Causality Formulation", status: "idle", badge: "Nemotron", message: "Synthesizing root-cause hypotheses via Nemotron-70B..." },
+  { id: "nemotron_critic", label: "Reward Critic Loop", role: "Hallucination Filter", status: "idle", badge: "Critique", message: "Evaluating hypotheses against AST syntax tree..." },
+  { id: "sandbox", label: "Ephemeral Sandbox", role: "Deterministic Pytest", status: "idle", badge: "Sandbox", message: "Executing pytest regression suite in isolated sandbox..." }
 ];
 
 export function useIncidentStream() {
@@ -30,6 +30,7 @@ export function useIncidentStream() {
   const [isInvestigating, setIsInvestigating] = useState(false);
   const [agents, setAgents] = useState<AgentNode[]>(INITIAL_AGENTS);
   const [activeAgentId, setActiveAgentId] = useState<string | null>(null);
+  const [activePhaseMessage, setActivePhaseMessage] = useState<string>("");
   
   const [reasoningText, setReasoningText] = useState("");
   const [tokenMetrics, setTokenMetrics] = useState<TokenMetrics>({
@@ -83,6 +84,7 @@ export function useIncidentStream() {
     setIsInvestigating(false);
     setAgents(INITIAL_AGENTS);
     setActiveAgentId(null);
+    setActivePhaseMessage("");
     setReasoningText("");
     setSandboxExecution({ step: "idle", reproCommand: "", initialOutput: "", initialExitCode: 0 });
     setPatch(null);
@@ -98,6 +100,7 @@ export function useIncidentStream() {
     setLiveLogs([]);
     setAgents(INITIAL_AGENTS);
     setActiveAgentId(null);
+    setActivePhaseMessage("");
     setReasoningText("");
     setSandboxExecution({ step: "idle", reproCommand: "", initialOutput: "", initialExitCode: 0 });
     setPatch(null);
@@ -157,6 +160,7 @@ export function useIncidentStream() {
     setSystemStatus("investigating");
     setReasoningText("");
     setPrCreated(false);
+    setActivePhaseMessage("Isolating fatal exception & callstack from telemetry logs...");
 
     try {
       const response = await fetch("http://localhost:8000/api/incident/trigger", {
@@ -185,8 +189,11 @@ export function useIncidentStream() {
           }
           if (data.type === "agent_update") {
             setActiveAgentId(data.agentId);
+            if (data.message) {
+              setActivePhaseMessage(data.message);
+            }
             setAgents((prev) =>
-              prev.map((a) => (a.id === data.agentId ? { ...a, status: data.status } : a))
+              prev.map((a) => (a.id === data.agentId ? { ...a, status: data.status, message: data.message || a.message } : a))
             );
           }
           if (data.type === "sandbox_update") {
@@ -196,6 +203,8 @@ export function useIncidentStream() {
             setPatch(data.patch);
             setSystemStatus("verified");
             setIsInvestigating(false);
+            setAgents((prev) => prev.map((a) => ({ ...a, status: "completed" })));
+            setActivePhaseMessage("Deterministic verification complete: Regression test passed (EXIT 0).");
             eventSource.close();
           }
         } catch (parseErr) {
@@ -270,6 +279,7 @@ export function useIncidentStream() {
     isInvestigating,
     agents,
     activeAgentId,
+    activePhaseMessage,
     reasoningText,
     tokenMetrics,
     sandboxExecution,
