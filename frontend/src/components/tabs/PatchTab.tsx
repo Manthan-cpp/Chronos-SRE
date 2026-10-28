@@ -197,7 +197,7 @@ export const PatchTab: React.FC<PatchTabProps> = ({
               Fix &amp; Architectural Resolution Report
             </h2>
             <div className="mt-1 flex flex-wrap items-center gap-3 text-xs font-mono text-slate-600">
-              <span>Strategy: <strong className="text-slate-900">{scenario.fixReport.architecturalStrategy}</strong></span>
+              <span>Strategy: <strong className="text-slate-900">{scenario.fixReport?.architecturalStrategy || "Autonomous AST Remediation"}</strong></span>
               <span>•</span>
               <span>Branch: <strong className="text-slate-900">{patch.branchName}</strong></span>
               <span>•</span>
@@ -212,7 +212,7 @@ export const PatchTab: React.FC<PatchTabProps> = ({
                 1. What was fixed?
               </h3>
               <p className="text-slate-700">
-                {scenario.fixReport.summary}
+                {scenario.fixReport?.summary || "Automated architectural fix applied."}
               </p>
             </div>
 
@@ -222,7 +222,7 @@ export const PatchTab: React.FC<PatchTabProps> = ({
                 2. Step-by-Step Fix Execution
               </h3>
               <ul className="space-y-2 text-xs text-slate-700 pl-4 list-disc font-sans">
-                {scenario.fixReport.steps.map((step) => (
+                {(scenario.fixReport?.steps || []).map((step) => (
                   <li key={step.phase}>
                     <strong className="text-slate-900">{step.title}:</strong>{" "}
                     <span>{step.description}</span>

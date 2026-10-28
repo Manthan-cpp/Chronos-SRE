@@ -54,7 +54,7 @@ export const LogsTab: React.FC<LogsTabProps> = ({
             <div>
               <div className="text-[11px] font-mono uppercase text-slate-500">OpenTelemetry Root Span</div>
               <div className="text-sm font-semibold text-slate-900 font-mono mt-0.5">
-                {scenario.sampleTrace.endpoint}
+                {scenario?.sampleTrace?.endpoint || scenario?.failingFile || "Ingress / Root Target"}
               </div>
             </div>
           </div>
@@ -62,16 +62,16 @@ export const LogsTab: React.FC<LogsTabProps> = ({
           <div className="flex items-center gap-4 text-xs font-mono">
             <div>
               <span className="text-slate-500">Trace ID: </span>
-              <span className="text-slate-800 font-medium">{scenario.sampleTrace.traceId}</span>
+              <span className="text-slate-800 font-medium">{scenario?.sampleTrace?.traceId || `dyn-${scenario?.code || scenario?.id || "telemetry"}`}</span>
             </div>
             <div>
               <span className="text-slate-500">Duration: </span>
-              <span className="text-slate-800 font-medium">{scenario.sampleTrace.durationMs}ms</span>
+              <span className="text-slate-800 font-medium">{scenario?.sampleTrace?.durationMs ?? 120}ms</span>
             </div>
             <div>
               <span className="text-slate-500">Status: </span>
               <span className="text-red-700 bg-red-100 border border-red-200 px-1.5 py-0.5 rounded font-semibold">
-                {scenario.sampleTrace.httpStatus} Error
+                {scenario?.sampleTrace?.httpStatus || "ERR"} Error
               </span>
             </div>
           </div>

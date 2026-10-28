@@ -43,15 +43,15 @@ export interface IncidentScenario {
   category: "Concurrency" | "Dependency" | "Resource Exhaustion";
   description: string;
   failingFile: string;
-  sampleLogs: string[];
-  sampleTrace: {
+  sampleLogs?: string[];
+  sampleTrace?: {
     traceId: string;
     spanId: string;
     endpoint: string;
     durationMs: number;
     httpStatus: number;
   };
-  sampleCommit: {
+  sampleCommit?: {
     hash: string;
     author: string;
     message: string;

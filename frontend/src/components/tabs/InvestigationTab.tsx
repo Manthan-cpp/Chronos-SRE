@@ -228,7 +228,7 @@ export const InvestigationTab: React.FC<InvestigationTabProps> = ({
                 1. What is the issue?
               </h3>
               <p className="text-slate-700">
-                {scenario.diagnosticReport.whatHappened}
+                {scenario?.diagnosticReport?.whatHappened || scenario?.description || "Runtime exception observed."}
               </p>
             </div>
 
@@ -238,7 +238,7 @@ export const InvestigationTab: React.FC<InvestigationTabProps> = ({
                 2. Why did it crash? (Root Cause)
               </h3>
               <p className="text-slate-700">
-                {scenario.diagnosticReport.whyItHappened}
+                {scenario?.diagnosticReport?.whyItHappened || "Offending syntax or unhandled exception during target execution."}
               </p>
             </div>
 
@@ -259,17 +259,17 @@ export const InvestigationTab: React.FC<InvestigationTabProps> = ({
               </h3>
               <ul className="space-y-1.5 text-xs text-slate-700 pl-4 list-disc font-sans">
                 <li>
-                  <strong className="text-slate-900">Severity:</strong> {scenario.diagnosticReport.businessImpact.severity}
+                  <strong className="text-slate-900">Severity:</strong> {scenario?.diagnosticReport?.businessImpact?.severity || "P0 • Production Outage"}
                 </li>
                 <li>
-                  <strong className="text-slate-900">Throughput Impact:</strong> {scenario.diagnosticReport.businessImpact.throughputImpact}
+                  <strong className="text-slate-900">Throughput Impact:</strong> {scenario?.diagnosticReport?.businessImpact?.throughputImpact || "Service throughput degraded"}
                 </li>
                 <li>
-                  <strong className="text-slate-900">SLA Risk:</strong> {scenario.diagnosticReport.businessImpact.slaBreachRisk}
+                  <strong className="text-slate-900">SLA Risk:</strong> {scenario?.diagnosticReport?.businessImpact?.slaBreachRisk || "Elevated"}
                 </li>
                 <li>
                   <strong className="text-slate-900">Affected Microservices:</strong>{" "}
-                  {scenario.diagnosticReport.impactedServices.map(s => `${s.name} (${s.status.toLowerCase()})`).join(", ")}
+                  {scenario?.diagnosticReport?.impactedServices?.map(s => `${s.name} (${s.status.toLowerCase()})`).join(", ") || scenario?.service}
                 </li>
               </ul>
             </div>

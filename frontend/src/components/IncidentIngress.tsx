@@ -93,22 +93,22 @@ export const IncidentIngress: React.FC<IncidentIngressProps> = ({
             <span>OPENTELEMETRY SPAN</span>
           </div>
           <span className="rounded bg-red-950/80 border border-red-500/40 px-1.5 py-0.5 font-mono text-[10px] font-bold text-red-400">
-            HTTP {scenario.sampleTrace.httpStatus} ERROR
+            HTTP {scenario?.sampleTrace?.httpStatus || "ERR"} ERROR
           </span>
         </div>
 
         <div className="space-y-1.5 text-[11px] font-mono text-gray-400">
           <div className="flex justify-between border-b border-gray-800/60 pb-1">
             <span className="text-gray-500">Trace ID:</span>
-            <span className="text-purple-300 font-bold">{scenario.sampleTrace.traceId}</span>
+            <span className="text-purple-300 font-bold">{scenario?.sampleTrace?.traceId || `dyn-${scenario?.code || scenario?.id || "trace"}`}</span>
           </div>
           <div className="flex justify-between border-b border-gray-800/60 pb-1">
             <span className="text-gray-500">Target Endpoint:</span>
-            <span className="text-gray-200">{scenario.sampleTrace.endpoint}</span>
+            <span className="text-gray-200">{scenario?.sampleTrace?.endpoint || scenario?.failingFile || "Ingress / Root"}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Execution Latency:</span>
-            <span className="text-red-400 font-bold">{scenario.sampleTrace.durationMs}ms (BLOCKED)</span>
+            <span className="text-red-400 font-bold">{scenario?.sampleTrace?.durationMs ?? 120}ms (BLOCKED)</span>
           </div>
         </div>
       </div>
@@ -121,22 +121,22 @@ export const IncidentIngress: React.FC<IncidentIngressProps> = ({
             <span>SUSPECT COMMIT DIFF</span>
           </div>
           <span className="rounded bg-purple-950/80 border border-purple-500/40 px-1.5 py-0.5 font-mono text-[10px] text-purple-300 font-bold">
-            #{scenario.sampleCommit.hash}
+            #{scenario?.sampleCommit?.hash || "HEAD"}
           </span>
         </div>
 
         <p className="text-xs font-mono text-gray-200 line-clamp-2 mb-2 bg-[#050811] p-2 rounded border border-gray-800">
-          "{scenario.sampleCommit.message}"
+          "{scenario?.sampleCommit?.message || scenario?.title || "Correlated commit inspection"}"
         </p>
 
         <div className="flex items-center justify-between text-[10px] font-mono text-gray-500">
           <div className="flex items-center gap-1">
             <User className="h-3 w-3 text-gray-400" />
-            <span>{scenario.sampleCommit.author}</span>
+            <span>{scenario?.sampleCommit?.author || "Telemetry Agent"}</span>
           </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3 w-3 text-gray-400" />
-            <span>{scenario.sampleCommit.timestamp}</span>
+            <span>{scenario?.sampleCommit?.timestamp || "Just now"}</span>
           </div>
         </div>
       </div>

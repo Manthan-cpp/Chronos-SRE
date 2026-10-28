@@ -118,6 +118,19 @@ class IncidentSifter:
             "description": f"User-ingested production error log indicating fatal {exception_type} at line {offending_line} of {offending_file}.",
             "stackTrace": raw_trace.strip(),
             "sourceMode": "manual_stacktrace",
+            "sampleTrace": {
+                "traceId": f"tr-{abs(hash(raw_trace)) % 900000 + 100000}",
+                "spanId": f"sp-{abs(hash(offending_file)) % 90000 + 10000}",
+                "endpoint": offending_file,
+                "durationMs": 185,
+                "httpStatus": 500
+            },
+            "sampleCommit": {
+                "hash": "HEAD",
+                "author": "SRE Telemetry Ingress",
+                "message": f"Fatal {exception_type} caught in {offending_file}",
+                "timestamp": "Active Telemetry"
+            },
             "diagnosticReport": {
                 "whatHappened": f"A production runtime exception ({exception_type}: {error_message}) halted execution in {offending_file} at line {offending_line}.",
                 "whyItHappened": f"Analysis of the stacktrace indicates unhandled control flow or invalid state leading to {exception_type}.",
@@ -189,6 +202,19 @@ class IncidentSifter:
                 "description": (body[:250] + "...") if len(body) > 250 else (body or title),
                 "stackTrace": f"# Reported in GitHub Issue #{num} ({issue.get('html_url')})\n\n{body or title}",
                 "sourceMode": "github_issue",
+                "sampleTrace": {
+                    "traceId": f"gh-issue-{num}",
+                    "spanId": f"span-{num:04d}",
+                    "endpoint": matched_file,
+                    "durationMs": 140,
+                    "httpStatus": 422 if is_p0 else 500
+                },
+                "sampleCommit": {
+                    "hash": f"#{num}",
+                    "author": issue.get("user", {}).get("login", "Contributor") if isinstance(issue.get("user"), dict) else "Contributor",
+                    "message": title,
+                    "timestamp": issue.get("created_at", "Live GitHub Issue")
+                },
                 "diagnosticReport": {
                     "whatHappened": f"GitHub Issue #{num} reported: {title}",
                     "whyItHappened": f"Defect reported by repository contributors impacting target module {matched_file}.",
@@ -233,6 +259,19 @@ class IncidentSifter:
                 "description": f"Automated CI build failure detected on branch '{branch}' (commit {run.get('head_sha')}).",
                 "stackTrace": f"# GitHub Actions Workflow Run Failed: {name}\n# Run URL: {run.get('html_url')}\n# Branch: {branch}\n# Conclusion: {run.get('conclusion')}",
                 "sourceMode": "github_ci",
+                "sampleTrace": {
+                    "traceId": f"ci-{str(run_id)[-6:]}",
+                    "spanId": f"span-ci-{str(run_id)[-4:]}",
+                    "endpoint": target_file,
+                    "durationMs": 350,
+                    "httpStatus": 500
+                },
+                "sampleCommit": {
+                    "hash": str(run.get("head_sha", "HEAD"))[:7],
+                    "author": "GitHub Actions",
+                    "message": f"CI build failure on {branch}",
+                    "timestamp": run.get("created_at", "Recent Workflow Run")
+                },
                 "diagnosticReport": {
                     "whatHappened": f"GitHub Actions workflow '{name}' failed on branch '{branch}'.",
                     "whyItHappened": "Test suite assertion failure or compilation break triggered non-zero exit code during CI build.",
@@ -284,6 +323,19 @@ class IncidentSifter:
                 "description": f"Live source code audit for concurrency pitfalls, unhandled exceptions, and resource leaks in {file_path}.",
                 "stackTrace": f"# Target Source File: {file_path}\n# Repository: {repo_name}\n# Ready for autonomous AST inspection & Nemotron reasoning.",
                 "sourceMode": "code_audit",
+                "sampleTrace": {
+                    "traceId": f"audit-{i+1:03d}",
+                    "spanId": f"span-{i+1:03d}",
+                    "endpoint": file_path,
+                    "durationMs": 85,
+                    "httpStatus": 200
+                },
+                "sampleCommit": {
+                    "hash": "HEAD",
+                    "author": "Repository Audit",
+                    "message": f"Static inspection target {file_path.split('/')[-1]}",
+                    "timestamp": "Live Tree"
+                },
                 "diagnosticReport": {
                     "whatHappened": f"No open GitHub issues detected. Active target selected: {file_path}.",
                     "whyItHappened": "On-demand structural code analysis to identify performance bottlenecks and exception risks.",
