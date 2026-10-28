@@ -1,6 +1,6 @@
 """
-Async Worker Deadlock Scenario (ASYNC-DEADLOCK-402)
-Real concurrency deadlock where two asynchronous batch workers cross-depend on locks.
+Async Worker Deadlock Scenario (ASYNC-DEADLOCK-402) - RESOLVED
+Enforces global deterministic lock ordering (Lock Alpha before Lock Beta) to eliminate circular waiting.
 """
 
 import asyncio
@@ -21,25 +21,14 @@ class DeadlockedBatchProcessor:
         self.processed_records: Dict[str, Any] = {}
 
     async def process_pipeline_alpha(self, item_id: str) -> None:
-        """Pipeline Alpha acquires Lock A, performs work, then acquires Lock B."""
-        logger.info(f"Alpha: Attempting to acquire Lock Alpha for {item_id}")
         async with self.registry.lock_alpha:
-            logger.info(f"Alpha: Acquired Lock Alpha for {item_id}")
-            # Emulate I/O pause to trigger race condition
-            await asyncio.sleep(0.05)
-            logger.info(f"Alpha: Attempting to acquire Lock Beta for {item_id}")
+            await asyncio.sleep(0.01)
             async with self.registry.lock_beta:
-                logger.info(f"Alpha: Acquired Lock Beta, completing {item_id}")
                 self.processed_records[item_id] = "PROCESSED_BY_ALPHA"
 
     async def process_pipeline_beta(self, item_id: str) -> None:
-        """Pipeline Beta acquires Lock B first, then attempts Lock A (classic circular lock dependency)."""
-        logger.info(f"Beta: Attempting to acquire Lock Beta for {item_id}")
-        async with self.registry.lock_beta:
-            logger.info(f"Beta: Acquired Lock Beta for {item_id}")
-            # Emulate I/O pause to trigger race condition
-            await asyncio.sleep(0.05)
-            logger.info(f"Beta: Attempting to acquire Lock Alpha for {item_id}")
-            async with self.registry.lock_alpha:
-                logger.info(f"Beta: Acquired Lock Alpha, completing {item_id}")
+        # FIX: Acquire Lock Alpha FIRST to preserve deterministic hierarchy
+        async with self.registry.lock_alpha:
+            await asyncio.sleep(0.01)
+            async with self.registry.lock_beta:
                 self.processed_records[item_id] = "PROCESSED_BY_BETA"
