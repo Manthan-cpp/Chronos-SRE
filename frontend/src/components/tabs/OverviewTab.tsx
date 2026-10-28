@@ -63,7 +63,7 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
             Connect Target GitHub Repository
           </h1>
           <p className="text-xs text-slate-600 max-w-2xl leading-relaxed mb-6">
-            Chronos-SRE dynamically ingests any public GitHub repository (e.g. <code className="font-mono bg-black/[0.05] px-1 py-0.5 rounded">Manthan-cpp/GramRaksha-AI</code> or <code className="font-mono bg-black/[0.05] px-1 py-0.5 rounded">Manthan-cpp/Chronos-SRE</code>). Enter your repository below to discover active bugs from open GitHub issues, failed CI actions, or ingest a real production traceback.
+            Chronos-SRE dynamically ingests any public GitHub repository (e.g. <code className="font-mono bg-black/[0.05] px-1 py-0.5 rounded">Manthan-cpp/GramRaksha-AI</code>). Enter your repository below to discover active bugs from open GitHub issues, failed CI actions, or ingest a real production traceback.
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 max-w-xl mb-4">
@@ -89,17 +89,10 @@ export const OverviewTab: React.FC<OverviewTabProps> = ({
           </div>
 
           <div className="flex flex-wrap items-center gap-2 pt-2 text-[11px] text-slate-500 font-mono">
-            <span>Quick Presets:</span>
-            <button
-              onClick={() => onConnectRepo("Manthan-cpp/Chronos-SRE")}
-              className="hover:text-slate-900 hover:underline cursor-pointer"
-            >
-              Manthan-cpp/Chronos-SRE
-            </button>
-            <span>•</span>
+            <span>Quick Preset:</span>
             <button
               onClick={() => onConnectRepo("Manthan-cpp/GramRaksha-AI")}
-              className="hover:text-slate-900 hover:underline cursor-pointer"
+              className="hover:text-slate-900 hover:underline cursor-pointer font-medium text-slate-700"
             >
               Manthan-cpp/GramRaksha-AI
             </button>

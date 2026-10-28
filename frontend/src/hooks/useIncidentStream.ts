@@ -103,7 +103,7 @@ export function useIncidentStream() {
 
   // 2. Connect Target Repository
   const connectRepo = useCallback(async (targetRepo?: string) => {
-    const rawInput = (targetRepo || repoInput || "Manthan-cpp/Chronos-SRE").trim();
+    const rawInput = (targetRepo || repoInput || "").trim();
     if (!rawInput) return;
 
     setIsConnectingRepo(true);
@@ -331,7 +331,7 @@ export function useIncidentStream() {
   const createPullRequest = useCallback(async () => {
     setIsCreatingPR(true);
     try {
-      const targetRepo = connectedRepo || "Manthan-cpp/Chronos-SRE";
+      const targetRepo = connectedRepo || "";
       const res = await fetch("http://localhost:8000/api/pr/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -355,7 +355,7 @@ export function useIncidentStream() {
         setPrCreated(true);
       }
     } catch {
-      setPrUrl(`https://github.com/${connectedRepo || "Manthan-cpp/Chronos-SRE"}/pulls`);
+      setPrUrl(`https://github.com/${connectedRepo || "target-repo"}/pulls`);
       setPrCreated(true);
     } finally {
       setIsCreatingPR(false);
