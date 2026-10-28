@@ -57,8 +57,26 @@ export interface IncidentScenario {
     message: string;
     timestamp: string;
   };
+  failingLine?: number;
+  exceptionType?: string;
+  errorMessage?: string;
+  stackTrace?: string;
+  sourceMode?: "benchmark" | "manual_stacktrace" | "github_issue" | "github_ci" | "code_audit";
   diagnosticReport?: IncidentDiagnosticReport;
   fixReport?: IncidentFixReport;
+}
+
+export interface RepoMetadata {
+  name: string;
+  full_name: string;
+  owner: string;
+  default_branch: string;
+  language: string;
+  description: string;
+  stars: number;
+  forks: number;
+  open_issues_count: number;
+  html_url: string;
 }
 
 export type AgentNodeId = "sifter" | "tavily" | "nemotron_hypothesis" | "nemotron_critic" | "sandbox" | "pr_emitter";

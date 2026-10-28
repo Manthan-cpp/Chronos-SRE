@@ -19,6 +19,15 @@ export default function Home() {
     connectedRepo,
     repoInput,
     setRepoInput,
+    repoMetadata,
+    fileTree,
+    manualLogInput,
+    setManualLogInput,
+    isConnectingRepo,
+    isDiscoveringIncidents,
+    discoveryMode,
+    discoverIncidents,
+    loadBenchmarkScenarios,
     connectRepo,
     disconnectRepo,
     scenarios,
@@ -180,6 +189,15 @@ export default function Home() {
                 isInvestigating={isInvestigating}
                 onSimulate={handleSimulate}
                 onNavigateToTab={(tab) => setActiveTab(tab as TabKey)}
+                repoMetadata={repoMetadata}
+                fileTree={fileTree}
+                manualLogInput={manualLogInput}
+                onManualLogInputChange={setManualLogInput}
+                onDiscoverIncidents={(customLog) => discoverIncidents(connectedRepo || "", customLog)}
+                onLoadBenchmarks={loadBenchmarkScenarios}
+                isConnectingRepo={isConnectingRepo}
+                isDiscoveringIncidents={isDiscoveringIncidents}
+                discoveryMode={discoveryMode}
               />
             )}
 
