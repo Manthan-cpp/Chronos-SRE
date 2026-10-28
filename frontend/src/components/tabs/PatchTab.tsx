@@ -158,23 +158,29 @@ export const PatchTab: React.FC<PatchTabProps> = ({
 
           {/* Monaco Diff Editor */}
           <div className="h-[480px] w-full bg-[#0f172a]">
-            <DiffEditor
-              height="100%"
-              language="python"
-              original={patch.originalCode}
-              modified={patch.patchedCode}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                renderSideBySide: !inlineMode,
-                minimap: { enabled: false },
-                fontSize: 12,
-                fontFamily: "JetBrains Mono, Fira Code, monospace",
-                lineNumbers: "on",
-                scrollBeyondLastLine: false,
-                padding: { top: 12, bottom: 12 }
-              }}
-            />
+            {(() => {
+              const ext = patch.filePath.split(".").pop()?.toLowerCase();
+              const lang = ext === "ts" || ext === "tsx" ? "typescript" : ext === "js" || ext === "jsx" ? "javascript" : ext === "json" ? "json" : "python";
+              return (
+                <DiffEditor
+                  height="100%"
+                  language={lang}
+                  original={patch.originalCode}
+                  modified={patch.patchedCode}
+                  theme="vs-dark"
+                  options={{
+                    readOnly: true,
+                    renderSideBySide: !inlineMode,
+                    minimap: { enabled: false },
+                    fontSize: 12,
+                    fontFamily: "JetBrains Mono, Fira Code, monospace",
+                    lineNumbers: "on",
+                    scrollBeyondLastLine: false,
+                    padding: { top: 12, bottom: 12 }
+                  }}
+                />
+              );
+            })()}
           </div>
         </div>
       ) : (

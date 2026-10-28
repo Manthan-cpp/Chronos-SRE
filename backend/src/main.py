@@ -285,7 +285,11 @@ async def stream_incident(
                     yield f"data: {json.dumps({'type': 'sandbox_update', 'sandbox': {'step': 'verified_pass', 'reproCommand': 'ast.parse -v', 'initialOutput': sb['pre_output'], 'patchedOutput': sb['post_output'], 'initialExitCode': 1}})}\n\n"
                     yield f"data: {json.dumps({'type': 'agent_update', 'agentId': 'sandbox', 'status': 'completed', 'message': 'Deterministic verification complete: AST syntax and safety passed (EXIT 0).'})}\n\n"
                     clean_branch = f"chronos/fix-{scenarioId.lower().replace('#', '').replace(' ', '-')}"
-                    yield f"data: {json.dumps({'type': 'patch_ready', 'patch': {'filePath': patch_data['file'], 'originalCode': patch_data.get('original_code', ''), 'patchedCode': patch_data.get('patched_code', ''), 'diffSummary': '+1 line, -0 lines (AST Guard)', 'branchName': clean_branch}})}\n\n"
+                    diff_text = patch_data.get("diff", "")
+                    added_lines = sum(1 for l in diff_text.splitlines() if l.startswith("+") and not l.startswith("+++"))
+                    deleted_lines = sum(1 for l in diff_text.splitlines() if l.startswith("-") and not l.startswith("---"))
+                    diff_summary = f"+{added_lines} lines, -{deleted_lines} lines (Autonomous Fix)"
+                    yield f"data: {json.dumps({'type': 'patch_ready', 'patch': {'filePath': patch_data['file'], 'originalCode': patch_data.get('original_code', ''), 'patchedCode': patch_data.get('patched_code', ''), 'diffSummary': diff_summary, 'branchName': clean_branch}})}\n\n"
                 await asyncio.sleep(0.01)
 
     return StreamingResponse(
