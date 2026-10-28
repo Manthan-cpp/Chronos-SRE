@@ -38,32 +38,32 @@ export const Navbar: React.FC<NavbarProps> = ({
   onTriggerInvestigation
 }) => {
   return (
-    <header className="glass-header sticky top-0 z-50 px-6 py-2.5">
-      <div className="mx-auto flex max-w-7xl items-center justify-between">
+    <header className="glass-header sticky top-0 z-50 px-4 sm:px-6 py-2.5 w-full">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 sm:gap-4">
         {/* Brand & Inputs */}
-        <div className="flex items-center gap-5">
-          <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
+          <div className="flex items-center gap-2.5 shrink-0">
             <img
               src="/logo.png"
               alt="Chronos SRE Logo"
-              className="h-10 w-10 object-contain shrink-0 select-none"
+              className="h-9 w-9 object-contain shrink-0 select-none"
             />
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-2xl tracking-tight text-slate-900 font-sans">
+            <div className="flex items-center gap-1.5">
+              <span className="font-extrabold text-xl sm:text-2xl tracking-tight text-slate-900 font-sans">
                 Chronos
               </span>
-              <span className="text-[11px] font-mono font-bold tracking-widest text-white bg-slate-900 px-2 py-0.5 rounded shadow-xs uppercase">
+              <span className="text-[10px] font-mono font-bold tracking-widest text-white bg-slate-900 px-1.5 py-0.5 rounded shadow-xs uppercase">
                 SRE
               </span>
             </div>
           </div>
 
-          <div className="h-4 w-px bg-black/10" />
+          <div className="hidden sm:block h-4 w-px bg-black/10 shrink-0" />
 
           {/* GitHub Repository Capsule */}
-          <div className="glass-nav-pill flex items-center gap-2 rounded-lg px-3 py-1.5">
+          <div className="glass-nav-pill flex items-center gap-2 rounded-lg px-2.5 sm:px-3 py-1.5 shrink-0">
             <GithubIcon className="h-3.5 w-3.5 text-slate-600 shrink-0" />
-            <span className="text-[11px] font-mono text-slate-500">Repo:</span>
+            <span className="text-[11px] font-mono text-slate-500 hidden sm:inline">Repo:</span>
 
             {!connectedRepo ? (
               <div className="flex items-center gap-1.5">
@@ -72,27 +72,30 @@ export const Navbar: React.FC<NavbarProps> = ({
                   value={repoInput}
                   onChange={(e) => onRepoInputChange(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && onConnectRepo()}
-                  placeholder="owner/repo (e.g. Manthan-cpp/Chronos-SRE)"
+                  placeholder="owner/repo"
                   disabled={isInvestigating}
-                  className="w-56 bg-transparent text-xs font-mono text-slate-900 placeholder:text-slate-400 outline-none"
+                  className="w-32 sm:w-44 md:w-52 bg-transparent text-xs font-mono text-slate-900 placeholder:text-slate-400 outline-none"
                 />
                 <button
                   onClick={() => onConnectRepo()}
                   disabled={!repoInput.trim() || isInvestigating}
-                  className="px-2 py-0.5 text-[11px] font-mono font-medium rounded bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer"
+                  className="px-2 py-0.5 text-[11px] font-mono font-medium rounded bg-slate-900 text-white hover:bg-slate-800 disabled:opacity-40 transition-colors cursor-pointer shrink-0"
                 >
                   Connect
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-mono font-semibold text-slate-900">
+              <div className="flex items-center gap-1.5 min-w-0">
+                <span
+                  className="text-xs font-mono font-semibold text-slate-900 truncate max-w-[120px] sm:max-w-[180px] md:max-w-[220px]"
+                  title={connectedRepo}
+                >
                   {connectedRepo}
                 </span>
                 <button
                   onClick={onDisconnectRepo}
                   disabled={isInvestigating}
-                  className="p-1 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer"
+                  className="p-1 text-slate-400 hover:text-slate-800 transition-colors cursor-pointer shrink-0"
                   title="Disconnect Repository"
                 >
                   <Unlink className="h-3 w-3" />
@@ -101,11 +104,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             )}
           </div>
 
-          <div className="hidden lg:block h-4 w-px bg-black/10" />
+          <div className="hidden lg:block h-4 w-px bg-black/10 shrink-0" />
 
           {/* Incident Selector Capsule */}
-          <div className="glass-nav-pill flex items-center gap-2 rounded-lg px-3 py-1.5">
-            <span className="text-[11px] font-mono text-slate-500">Incident:</span>
+          <div className="glass-nav-pill hidden md:flex items-center gap-2 rounded-lg px-3 py-1.5 min-w-0 max-w-[220px] lg:max-w-[300px]">
+            <span className="text-[11px] font-mono text-slate-500 shrink-0">Incident:</span>
             <select
               value={activeScenario?.id ?? ""}
               onChange={(e) => {
@@ -118,20 +121,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                 }
               }}
               disabled={!connectedRepo || isInvestigating}
-              className="bg-transparent text-xs font-mono font-medium text-slate-900 outline-none cursor-pointer disabled:opacity-40"
+              className="bg-transparent text-xs font-mono font-medium text-slate-900 outline-none cursor-pointer disabled:opacity-40 truncate w-full"
             >
               {!connectedRepo ? (
                 <option value="" className="bg-[#dde1e6] text-slate-500">
-                  -- Connect Repository First --
+                  -- Connect Repo First --
                 </option>
               ) : (
                 <>
                   <option value="" className="bg-[#dde1e6] text-slate-500">
-                    -- Select Incident from Repo --
+                    -- Select Incident --
                   </option>
                   {scenarios.map((s) => (
                     <option key={s.id} value={s.id} className="bg-[#dde1e6] text-slate-900">
-                      {s.code} — {s.title}
+                      {s.code} — {s.title.length > 36 ? s.title.slice(0, 34) + "..." : s.title}
                     </option>
                   ))}
                 </>
@@ -141,15 +144,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Right Controls */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           {/* Status Badge */}
           {!connectedRepo && (
-            <span className="text-xs font-mono font-medium text-slate-500 bg-slate-200/70 border border-slate-300 px-2.5 py-1 rounded-md">
+            <span className="hidden sm:inline-block text-xs font-mono font-medium text-slate-500 bg-slate-200/70 border border-slate-300 px-2.5 py-1 rounded-md">
               No Repo Connected
             </span>
           )}
           {connectedRepo && systemStatus === "idle" && (
-            <span className="text-xs font-mono font-medium text-slate-700 bg-white/70 border border-slate-300 px-2.5 py-1 rounded-md">
+            <span className="hidden sm:inline-block text-xs font-mono font-medium text-slate-700 bg-white/70 border border-slate-300 px-2.5 py-1 rounded-md">
               {activeScenario ? "Ready" : "Standby"}
             </span>
           )}
@@ -173,7 +176,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onDisconnectRepo}
             disabled={isInvestigating || !connectedRepo}
-            className="glass-nav-pill p-2 text-slate-500 hover:text-slate-900 rounded-lg transition-all disabled:opacity-30 cursor-pointer"
+            className="glass-nav-pill p-2 text-slate-500 hover:text-slate-900 rounded-lg transition-all disabled:opacity-30 cursor-pointer shrink-0"
             title="Reset War-Room to Blank"
           >
             <RotateCcw className="h-3.5 w-3.5" />
@@ -183,16 +186,16 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             disabled={isInvestigating || !connectedRepo || !activeScenario}
             onClick={onTriggerInvestigation}
-            className="flex items-center gap-2 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 px-4 py-2 text-xs font-mono font-medium text-white transition-colors cursor-pointer disabled:cursor-not-allowed shadow-sm"
+            className="flex items-center gap-2 rounded-lg bg-slate-900 hover:bg-slate-800 disabled:bg-slate-400 px-3 sm:px-4 py-2 text-xs font-mono font-medium text-white transition-colors cursor-pointer disabled:cursor-not-allowed shadow-sm shrink-0"
           >
             <Play className="h-3 w-3 fill-current" />
             <span>
               {isInvestigating
-                ? "Running Investigation..."
+                ? "Investigating..."
                 : !connectedRepo
-                ? "Connect Repo First"
+                ? "Connect Repo"
                 : !activeScenario
-                ? "Select Incident First"
+                ? "Select Incident"
                 : "Run Investigation"}
             </span>
           </button>

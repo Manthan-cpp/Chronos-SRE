@@ -63,7 +63,7 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen w-full relative font-sans" style={{ backgroundColor: "#dde1e6", color: "#0f172a" }}>
+    <div className="min-h-screen w-full relative font-sans overflow-x-hidden" style={{ backgroundColor: "#dde1e6", color: "#0f172a" }}>
       {/* 1. CursorGrid in Light Mode with Soft Gray Background */}
       <CursorGrid
         cellSize={32}
