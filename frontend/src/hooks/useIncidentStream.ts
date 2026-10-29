@@ -19,7 +19,7 @@ const INITIAL_AGENTS: AgentNode[] = [
   { id: "sandbox", label: "Ephemeral Sandbox", role: "Deterministic Pytest", status: "idle" }
 ];
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000").replace(/\/+$/, "");
 
 export function useIncidentStream() {
   const [connectedRepo, setConnectedRepo] = useState<string | null>(null);

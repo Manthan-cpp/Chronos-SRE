@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: chronos-sre-backend
+    env: python
+    plan: free
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: uvicorn backend.src.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: PORT
+        value: 10000
+      - key: HOST
+        value: 0.0.0.0
+      - key: CORS_ORIGINS
+        sync: false
+      - key: NEBIUS_API_KEY
+        sync: false
+      - key: TAVILY_API_KEY
+        sync: false
+      - key: GITHUB_TOKEN
+        sync: false
+      - key: GITHUB_DEFAULT_REPO
+        sync: false

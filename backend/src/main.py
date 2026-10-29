@@ -27,10 +27,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Enable CORS for Next.js frontend
+# Enable CORS for Next.js frontend (Supports localhost, configured domains, and all Vercel deployments)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,6 +71,8 @@ class PRRequest(BaseModel):
     summary: Optional[str] = None
     sandboxOutput: Optional[str] = None
 
+@app.get("/")
+@app.get("/health")
 @app.get("/api/health")
 async def health_check():
     return {
