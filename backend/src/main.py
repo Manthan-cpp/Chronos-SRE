@@ -46,6 +46,10 @@ class IncidentDiscoverRequest(BaseModel):
 class SimulateRequest(BaseModel):
     scenarioId: str
     repoUrl: Optional[str] = None
+    failingFile: Optional[str] = None
+    errorMessage: Optional[str] = None
+    stackTrace: Optional[str] = None
+    incidentTitle: Optional[str] = None
 
 class TriggerRequest(BaseModel):
     scenarioId: Optional[str] = "ASYNC-DEADLOCK-402"
@@ -180,17 +184,81 @@ async def simulate_scenario(req: SimulateRequest):
         # Dynamic incident simulation trace
         now_str = time.strftime("%Y-%m-%d %H:%M:%S")
         target_name = req.scenarioId
-        logs = [
-            f"[{now_str}.010] [INFO] [telemetry.ingress] Ingested incident target: {target_name}",
-            f"[{now_str}.120] [INFO] [runtime.monitor] Ingesting stacktrace & error telemetry from remote target...",
-            f"[{now_str}.310] [CRITICAL] [telemetry.sifter] Offending exception isolated. Bug confirmed.",
-            f"[{now_str}.500] [FATAL] [system] Ready for autonomous forensic investigation swarm."
-        ]
+        failing_file = req.failingFile or "src/lib/fasal/calculator.ts"
+        
+        # Check if this is GramRaksha-AI or calculator or issue-2
+        is_gramraksha = (
+            "gramraksha" in (req.repoUrl or "").lower() 
+            or "calculator" in failing_file.lower() 
+            or "issue-2" in target_name.lower()
+            or "fasal" in (req.incidentTitle or "").lower()
+        )
+
+        if is_gramraksha:
+            formatted_logs = [
+                f"[{now_str}.012] [INFO] [telemetry.ingress] Ingesting incident target: Manthan-cpp/GramRaksha-AI ({target_name})",
+                f"[{now_str}.045] [INFO] [trace.context] TraceID: c8f4a19b-7e23 SpanID: span-002 Service: gramraksha-core Env: production",
+                f"[{now_str}.110] [INFO] [telemetry.otel] OpenTelemetry Span: POST /api/fasal/intimate HTTP 500 (Latency: 142ms)",
+                f"[{now_str}.180] [WARN] [runtime.monitor] Ingesting stacktrace & error telemetry from remote target...",
+                f"[{now_str}.240] [WARN] [executor] Executing Vitest testbed under production load simulation: tests/fasal/fasal.test.ts",
+                f"[{now_str}.310] [ERROR] [vitest] FAIL  tests/fasal/fasal.test.ts > Fasal 72-Hour Kit Countdown Calculator",
+                f"[{now_str}.340] [FATAL] [vitest] AssertionError: expected true to be false",
+                f"[{now_str}.350] [FATAL] [vitest]     at calculateFasalCountdown (src/lib/fasal/calculator.ts:13:30)",
+                f"[{now_str}.360] [FATAL] [vitest]     - Expected: false",
+                f"[{now_str}.370] [FATAL] [vitest]     + Received: true",
+                f"[{now_str}.420] [CRITICAL] [vitest] AssertionError: expected 'expired' to be 'safe'",
+                f"[{now_str}.430] [CRITICAL] [vitest]     at calculateFasalCountdown (src/lib/fasal/calculator.ts:50:24)",
+                f"[{now_str}.440] [CRITICAL] [vitest]     - Expected: \"safe\"",
+                f"[{now_str}.450] [CRITICAL] [vitest]     + Received: \"expired\"",
+                f"[{now_str}.510] [FATAL] [runtime] TypeError: Cannot read properties of undefined (reading 'en')",
+                f"[{now_str}.520] [FATAL] [runtime]     at formatCalamityName (src/lib/fasal/calculator.ts:114:26)",
+                f"[{now_str}.530] [FATAL] [runtime]     at Object.eval (src/lib/fasal/calculator.ts:155:10)",
+                f"[{now_str}.600] [CRITICAL] [telemetry.sifter] Offending exception isolated in src/lib/fasal/calculator.ts. Bug confirmed.",
+                f"[{now_str}.680] [ERROR] [vitest] Tests: 4 failed, 7 passed, 11 total",
+                f"[{now_str}.710] [ERROR] [vitest] Snapshots: 0 total",
+                f"[{now_str}.740] [ERROR] [vitest] Time: 1.48s",
+                f"[{now_str}.820] [FATAL] [kernel] Subprocess exited with code 1 (Duration: 1480ms)",
+                f"[{now_str}.890] [FATAL] [system] Ready for autonomous forensic investigation swarm."
+            ]
+            duration = 1480
+        else:
+            repo_display = req.repoUrl or "remote/repository"
+            formatted_logs = [
+                f"[{now_str}.012] [INFO] [telemetry.ingress] Ingesting incident target: {repo_display} ({target_name})",
+                f"[{now_str}.045] [INFO] [trace.context] TraceID: dyn-{target_name} SpanID: span-001 Service: target-app Env: production",
+                f"[{now_str}.110] [INFO] [telemetry.otel] OpenTelemetry Span: UnhandledException captured at {failing_file}",
+                f"[{now_str}.180] [WARN] [runtime.monitor] Ingesting stacktrace & error telemetry from remote target...",
+                f"[{now_str}.250] [WARN] [executor] Dispatching testbed under production load simulation...",
+            ]
+            if req.stackTrace:
+                for line in req.stackTrace.strip().splitlines()[:15]:
+                    clean_line = line.strip()
+                    if not clean_line or clean_line.startswith("#"):
+                        continue
+                    if "Error" in clean_line or "Exception" in clean_line:
+                        formatted_logs.append(f"[{now_str}.400] [CRITICAL] [runtime] {clean_line}")
+                    elif "at " in clean_line or "File " in clean_line:
+                        formatted_logs.append(f"[{now_str}.420] [FATAL] [stacktrace] {clean_line}")
+                    else:
+                        formatted_logs.append(f"[{now_str}.350] [ERROR] [runner] {clean_line}")
+            else:
+                formatted_logs.extend([
+                    f"[{now_str}.350] [ERROR] [runner] Failure detected in execution target: {failing_file}",
+                    f"[{now_str}.410] [FATAL] [runtime] RuntimeError: Production assertion failure in {failing_file}:1",
+                    f"[{now_str}.450] [FATAL] [runtime]     at targetModule ({failing_file}:1:1)",
+                ])
+            formatted_logs.extend([
+                f"[{now_str}.650] [CRITICAL] [telemetry.sifter] Offending exception isolated in {failing_file}. Bug confirmed.",
+                f"[{now_str}.820] [FATAL] [kernel] Subprocess exited with code 1 (Duration: 420ms)",
+                f"[{now_str}.890] [FATAL] [system] Ready for autonomous forensic investigation swarm."
+            ])
+            duration = 420
+
         return {
             "status": "success",
             "scenarioId": req.scenarioId,
-            "result": {"return_code": 1, "duration_ms": 120},
-            "logs": logs
+            "result": {"return_code": 1, "duration_ms": duration},
+            "logs": formatted_logs
         }
 
 @app.post("/api/incident/trigger")

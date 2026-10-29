@@ -20,12 +20,12 @@ export const LogsTab: React.FC<LogsTabProps> = ({
 
   if (!scenario) {
     return (
-      <div className="glass-panel rounded-2xl p-12 text-center">
-        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-black/[0.05] border border-black/10 text-slate-500 mb-3">
+      <div className="glass-panel rounded-2xl p-12 text-center border border-black/10 dark:border-white/10">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-black/[0.05] dark:bg-white/10 border border-black/10 dark:border-white/15 text-slate-500 dark:text-zinc-400 mb-3">
           <Terminal className="h-6 w-6" />
         </div>
-        <h3 className="text-base font-semibold text-slate-900">No Telemetry Stream Ingested</h3>
-        <p className="text-xs text-slate-600 max-w-md mx-auto mt-1 leading-relaxed">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">No Telemetry Stream Ingested</h3>
+        <p className="text-xs text-slate-600 dark:text-zinc-400 max-w-md mx-auto mt-1 leading-relaxed">
           Chronos-SRE has not ingested any incident crash logs yet. Connect a target repository and select a testbed to run live pytest execution.
         </p>
       </div>
@@ -45,15 +45,15 @@ export const LogsTab: React.FC<LogsTabProps> = ({
   return (
     <div className="space-y-4">
       {/* Trace Info Bar */}
-      <div className="glass-panel rounded-2xl p-5">
+      <div className="glass-panel rounded-2xl p-5 border border-black/10 dark:border-white/10">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-black/[0.05] text-slate-700 border border-black/10">
+            <div className="p-2 rounded-lg bg-black/[0.05] dark:bg-white/10 text-slate-700 dark:text-zinc-300 border border-black/10 dark:border-white/15">
               <Network className="h-4 w-4" />
             </div>
             <div>
-              <div className="text-[11px] font-mono uppercase text-slate-500">OpenTelemetry Root Span</div>
-              <div className="text-sm font-semibold text-slate-900 font-mono mt-0.5">
+              <div className="text-[11px] font-mono uppercase text-slate-500 dark:text-zinc-400">OpenTelemetry Root Span</div>
+              <div className="text-sm font-semibold text-slate-900 dark:text-white font-mono mt-0.5">
                 {scenario?.sampleTrace?.endpoint || scenario?.failingFile || "Ingress / Root Target"}
               </div>
             </div>
@@ -61,16 +61,16 @@ export const LogsTab: React.FC<LogsTabProps> = ({
 
           <div className="flex items-center gap-4 text-xs font-mono">
             <div>
-              <span className="text-slate-500">Trace ID: </span>
-              <span className="text-slate-800 font-medium">{scenario?.sampleTrace?.traceId || `dyn-${scenario?.code || scenario?.id || "telemetry"}`}</span>
+              <span className="text-slate-500 dark:text-zinc-400">Trace ID: </span>
+              <span className="text-slate-800 dark:text-zinc-200 font-medium">{scenario?.sampleTrace?.traceId || `dyn-${scenario?.code || scenario?.id || "telemetry"}`}</span>
             </div>
             <div>
-              <span className="text-slate-500">Duration: </span>
-              <span className="text-slate-800 font-medium">{scenario?.sampleTrace?.durationMs ?? 120}ms</span>
+              <span className="text-slate-500 dark:text-zinc-400">Duration: </span>
+              <span className="text-slate-800 dark:text-zinc-200 font-medium">{scenario?.sampleTrace?.durationMs ?? 120}ms</span>
             </div>
             <div>
-              <span className="text-slate-500">Status: </span>
-              <span className="text-red-700 bg-red-100 border border-red-200 px-1.5 py-0.5 rounded font-semibold">
+              <span className="text-slate-500 dark:text-zinc-400">Status: </span>
+              <span className="text-slate-900 dark:text-zinc-100 bg-slate-200 dark:bg-zinc-800 border border-slate-300 dark:border-zinc-700 px-1.5 py-0.5 rounded font-semibold">
                 {scenario?.sampleTrace?.httpStatus || "ERR"} Error
               </span>
             </div>
@@ -79,16 +79,16 @@ export const LogsTab: React.FC<LogsTabProps> = ({
       </div>
 
       {/* Log Console Container */}
-      <div className="glass-panel rounded-2xl overflow-hidden">
+      <div className="glass-panel rounded-2xl overflow-hidden border border-black/10 dark:border-white/10">
         {/* Controls Toolbar */}
-        <div className="flex items-center justify-between border-b border-black/[0.08] px-5 py-3 bg-white/70 backdrop-blur-md">
+        <div className="flex items-center justify-between border-b border-black/[0.08] dark:border-white/10 px-5 py-3 bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md">
           <div className="flex items-center gap-2">
-            <Terminal className="h-4 w-4 text-slate-600" />
-            <span className="text-xs font-semibold text-slate-800">
-              Pytest Output & Log Stream ({filteredLogs.length} events)
+            <Terminal className="h-4 w-4 text-slate-600 dark:text-zinc-400" />
+            <span className="text-xs font-semibold text-slate-800 dark:text-zinc-200">
+              Pytest Output &amp; Log Stream ({filteredLogs.length} events)
             </span>
             {isStreamingLogs && (
-              <span className="text-[10px] font-mono font-medium text-slate-900 bg-black/[0.06] border border-black/10 px-2 py-0.5 rounded animate-pulse">
+              <span className="text-[10px] font-mono font-medium text-slate-900 dark:text-zinc-100 bg-black/[0.06] dark:bg-white/10 border border-black/10 dark:border-white/15 px-2 py-0.5 rounded animate-pulse">
                 Streaming from backend...
               </span>
             )}
@@ -96,52 +96,58 @@ export const LogsTab: React.FC<LogsTabProps> = ({
 
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Search className="h-3.5 w-3.5 absolute left-2.5 top-2 text-slate-400" />
+              <Search className="h-3.5 w-3.5 absolute left-2.5 top-2 text-slate-400 dark:text-zinc-500" />
               <input
                 type="text"
-                placeholder="Filter logs..."
+                placeholder="Filter logs or trace..."
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
-                className="w-48 rounded-lg border border-black/10 bg-white/90 pl-8 pr-3 py-1 text-xs font-mono text-slate-900 placeholder:text-slate-400 outline-none focus:border-slate-800"
+                className="pl-8 pr-3 py-1 text-xs font-mono rounded-lg border border-black/10 dark:border-white/15 bg-white/80 dark:bg-zinc-900/80 text-slate-800 dark:text-zinc-200 placeholder:text-slate-400 dark:placeholder:text-zinc-500 outline-none focus:border-slate-800 dark:focus:border-zinc-300 w-48 sm:w-64"
               />
             </div>
 
             <button
               onClick={handleCopy}
-              className="flex items-center gap-1.5 rounded-lg border border-black/10 bg-white px-2.5 py-1 text-xs text-slate-700 hover:text-black hover:border-black/20 transition-colors cursor-pointer"
+              disabled={liveLogs.length === 0}
+              className="flex items-center gap-1.5 text-xs text-slate-700 dark:text-zinc-300 hover:text-black dark:hover:text-white px-2.5 py-1 rounded-lg border border-black/10 dark:border-white/15 bg-white dark:bg-zinc-900 hover:border-black/20 dark:hover:border-white/25 transition-colors disabled:opacity-40 cursor-pointer"
             >
-              {copied ? <Check className="h-3.5 w-3.5 text-emerald-600" /> : <Copy className="h-3.5 w-3.5" />}
+              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
               <span>{copied ? "Copied" : "Copy"}</span>
             </button>
           </div>
         </div>
 
-        {/* Monospaced Log Stream Terminal */}
-        <div className="p-5 font-mono text-xs leading-relaxed max-h-[520px] overflow-y-auto space-y-1 bg-[#0f172a] text-slate-200">
+        {/* Live Logs Terminal Viewer */}
+        <div className="p-4 font-mono text-xs max-h-[580px] overflow-y-auto leading-relaxed bg-[#0b0f19] border-t border-black/10 dark:border-white/10">
           {filteredLogs.length === 0 ? (
-            <div className="py-12 text-center text-slate-400">
-              No log events captured yet. Click &quot;Simulate Crash via Pytest&quot; on the Overview tab to stream live output.
+            <div className="text-slate-500 dark:text-zinc-500 py-12 text-center">
+              {liveLogs.length === 0
+                ? "No log telemetry ingested yet. Click 'Simulate Crash Telemetry' from the Overview tab."
+                : "No logs matched the active filter."}
             </div>
           ) : (
-            filteredLogs.map((log, idx) => {
-              const isError = log.includes("[ERROR]") || log.includes("[FATAL]") || log.includes("[CRITICAL]") || log.includes("FAILED");
-              const isWarn = log.includes("[WARN]");
-              const isInfo = log.includes("[INFO]");
+            filteredLogs.map((log, i) => {
+              const isError = log.includes("ERROR") || log.includes("FAILED") || log.includes("Exception") || log.includes("Error:") || log.includes("Crash");
+              const isWarn = log.includes("WARN");
+              const isSuccess = log.includes("PASSED") || log.includes("SUCCESS") || log.includes("OK") || log.includes("verified");
 
               return (
                 <div
-                  key={idx}
-                  className={`px-2 py-0.5 rounded transition-colors ${
+                  key={i}
+                  className={`py-0.5 px-2 rounded-sm transition-colors font-mono select-text ${
                     isError
-                      ? "text-red-300 bg-red-950/30"
+                      ? "text-zinc-100 bg-white/10 border-l-2 border-zinc-400 pl-2 font-medium"
                       : isWarn
-                      ? "text-amber-300 bg-amber-950/20"
-                      : isInfo
-                      ? "text-blue-300"
-                      : "text-slate-300"
+                      ? "text-zinc-300 bg-white/5"
+                      : isSuccess
+                      ? "text-zinc-200"
+                      : "text-zinc-400 hover:bg-white/5"
                   }`}
                 >
-                  {log}
+                  <span className="text-zinc-600 select-none mr-3 text-[10px]">
+                    {(i + 1).toString().padStart(3, "0")}
+                  </span>
+                  <span>{log}</span>
                 </div>
               );
             })

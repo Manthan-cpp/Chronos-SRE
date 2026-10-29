@@ -208,7 +208,11 @@ export function useIncidentStream() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           scenarioId: activeScenario.id,
-          repoUrl: connectedRepo
+          repoUrl: connectedRepo,
+          failingFile: activeScenario.failingFile,
+          errorMessage: activeScenario.errorMessage,
+          stackTrace: activeScenario.stackTrace,
+          incidentTitle: activeScenario.title
         })
       });
 

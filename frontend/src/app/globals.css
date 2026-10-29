@@ -1,20 +1,60 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #dde1e6;
   --foreground: #0f172a;
+  --panel-bg: rgba(255, 255, 255, 0.52);
+  --panel-border: rgba(0, 0, 0, 0.10);
+  --card-bg: rgba(255, 255, 255, 0.62);
+  --card-hover-bg: rgba(255, 255, 255, 0.88);
+  --card-border: rgba(0, 0, 0, 0.09);
+  --card-border-hover: rgba(0, 0, 0, 0.18);
+  --header-bg: rgba(221, 225, 230, 0.85);
+  --header-border: rgba(0, 0, 0, 0.09);
+  --nav-pill-bg: rgba(255, 255, 255, 0.55);
+  --nav-pill-border: rgba(0, 0, 0, 0.10);
+  --nav-pill-hover-bg: rgba(255, 255, 255, 0.80);
+  --nav-pill-hover-border: rgba(0, 0, 0, 0.18);
+  --tab-bar-bg: rgba(221, 225, 230, 0.85);
+  --tab-bar-border: rgba(0, 0, 0, 0.08);
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-thumb-hover: #94a3b8;
+}
+
+.dark, :root.dark {
+  --background: #090a0f;
+  --foreground: #f8fafc;
+  --panel-bg: rgba(18, 20, 29, 0.75);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --card-bg: rgba(24, 26, 38, 0.70);
+  --card-hover-bg: rgba(34, 38, 54, 0.88);
+  --card-border: rgba(255, 255, 255, 0.10);
+  --card-border-hover: rgba(255, 255, 255, 0.22);
+  --header-bg: rgba(9, 10, 15, 0.88);
+  --header-border: rgba(255, 255, 255, 0.10);
+  --nav-pill-bg: rgba(255, 255, 255, 0.06);
+  --nav-pill-border: rgba(255, 255, 255, 0.12);
+  --nav-pill-hover-bg: rgba(255, 255, 255, 0.12);
+  --nav-pill-hover-border: rgba(255, 255, 255, 0.25);
+  --tab-bar-bg: rgba(9, 10, 15, 0.88);
+  --tab-bar-border: rgba(255, 255, 255, 0.10);
+  --scrollbar-thumb: #334155;
+  --scrollbar-thumb-hover: #475569;
 }
 
 html, body {
-  background-color: #dde1e6 !important;
-  background: #dde1e6 !important;
-  color: #0f172a !important;
+  background-color: var(--background) !important;
+  background: var(--background) !important;
+  color: var(--foreground) !important;
   min-height: 100vh;
   margin: 0;
   padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Minimal Monochrome Scrollbar */
@@ -28,58 +68,58 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: var(--scrollbar-thumb-hover);
 }
 
-/* Minimalist Light Glassmorphism (Strictly Monochrome) */
+/* Minimalist Glassmorphism (Strictly Monochrome Dual-Theme) */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--panel-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.52);
+  background: var(--card-bg);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.07);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .glass-card-hover {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .glass-card-hover:hover {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(0, 0, 0, 0.16);
-  box-shadow: 0 6px 18px -2px rgba(0, 0, 0, 0.06);
+  background: var(--card-hover-bg);
+  border-color: var(--card-border-hover);
+  box-shadow: 0 6px 18px -2px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
 
 .glass-header {
-  background: rgba(221, 225, 230, 0.85);
+  background: var(--header-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid var(--header-border);
 }
 
 .glass-nav-pill {
-  background: rgba(255, 255, 255, 0.45);
+  background: var(--nav-pill-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--nav-pill-border);
   transition: all 0.15s ease;
 }
 .glass-nav-pill:hover {
-  background: rgba(255, 255, 255, 0.70);
-  border-color: rgba(0, 0, 0, 0.16);
+  background: var(--nav-pill-hover-bg);
+  border-color: var(--nav-pill-hover-border);
 }
 
 /* Hide Next.js Development Indicator Badges & Toasts */

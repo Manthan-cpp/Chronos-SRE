@@ -9,7 +9,7 @@ interface MarkdownViewerProps {
 export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content }) => {
   if (!content) {
     return (
-      <div className="py-16 text-center text-slate-400 font-mono text-sm">
+      <div className="py-16 text-center text-zinc-500 font-mono text-sm">
         No investigation initiated yet. Connect a repository, select an incident testbed, and click &quot;Run Investigation&quot; to launch the autonomous forensic swarm.
       </div>
     );
@@ -23,7 +23,6 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content }) => {
     // Regex for inline code `code` and bold **bold**
     const parts: React.ReactNode[] = [];
     let remaining = text;
-    let keyIdx = 0;
 
     // Pattern to match either `code` or **bold**
     const regex = /(\*\*.*?\*\*|`.*?`)/g;
@@ -43,7 +42,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content }) => {
         return (
           <code
             key={i}
-            className="font-mono text-xs px-1.5 py-0.5 rounded bg-white/10 text-emerald-300 border border-white/10"
+            className="font-mono text-xs px-1.5 py-0.5 rounded bg-white/10 text-zinc-200 border border-white/10"
           >
             {inner}
           </code>
@@ -69,7 +68,7 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content }) => {
           key={`h3-${i}`}
           className="text-base font-bold text-white tracking-tight pb-1.5 mb-2 mt-4 first:mt-0 border-b border-white/10 flex items-center gap-2"
         >
-          <span className="h-2 w-2 rounded-full bg-emerald-400 inline-block shrink-0" />
+          <span className="h-2 w-2 rounded-full bg-zinc-300 inline-block shrink-0" />
           <span>{parseInline(headingText)}</span>
         </div>
       );
@@ -78,9 +77,9 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content }) => {
       renderedElements.push(
         <div
           key={`h4-${i}`}
-          className="text-sm font-semibold text-slate-100 tracking-tight mt-3 mb-1.5 flex items-center gap-2"
+          className="text-sm font-semibold text-zinc-200 tracking-tight mt-3 mb-1.5 flex items-center gap-2"
         >
-          <span className="text-slate-500 font-mono text-xs">§</span>
+          <span className="text-zinc-500 font-mono text-xs">§</span>
           <span>{parseInline(headingText)}</span>
         </div>
       );
@@ -89,20 +88,24 @@ export const MarkdownViewer: React.FC<MarkdownViewerProps> = ({ content }) => {
       renderedElements.push(
         <div
           key={`bullet-${i}`}
-          className="flex items-start gap-2.5 my-1.5 text-sm text-slate-300 leading-relaxed pl-3 border-l-2 border-white/10 hover:border-emerald-400/50 transition-colors"
+          className="flex items-start gap-2.5 my-1.5 text-sm text-zinc-300 leading-relaxed pl-3 border-l-2 border-white/10 hover:border-white/30 transition-colors"
         >
-          <span className="text-slate-500 select-none mt-0.5">•</span>
+          <span className="text-zinc-500 select-none mt-0.5">•</span>
           <div className="flex-1">{parseInline(bulletText)}</div>
         </div>
       );
     } else {
       renderedElements.push(
-        <p key={`p-${i}`} className="text-sm text-slate-300 leading-relaxed my-1">
+        <p key={`p-${i}`} className="text-sm text-zinc-300 leading-relaxed my-1">
           {parseInline(line)}
         </p>
       );
     }
   }
 
-  return <div className="space-y-1 font-sans">{renderedElements}</div>;
+  return (
+    <div className="font-mono text-xs space-y-1 select-text">
+      {renderedElements}
+    </div>
+  );
 };
