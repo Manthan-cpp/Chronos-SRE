@@ -1,5 +1,8 @@
 # ⚡ Chronos-SRE: Autonomous Incident Time-Travel & Healing Engine
 
+[![Live Demo: chronos-sre.vercel.app](https://img.shields.io/badge/Live%20Demo-chronos--sre.vercel.app-000000.svg?style=for-the-badge&logo=vercel)](https://chronos-sre.vercel.app)
+[![API Status: Live on Render](https://img.shields.io/badge/API-Live%20on%20Render-46E3B7.svg?style=for-the-badge&logo=render)](https://chronos-sre-backend.onrender.com/api/health)
+
 [![Nebius x NVIDIA Hackathon](https://img.shields.io/badge/Nebius%20x%20NVIDIA-Global%20AI%20Hackathon-76B900.svg)](https://devpost.com)
 [![Track: Coding & Agentic Engineering](https://img.shields.io/badge/Track-Coding%20%26%20Agentic%20Engineering-blue.svg)](https://devpost.com)
 [![Model: NVIDIA Nemotron-70B](https://img.shields.io/badge/Model-NVIDIA%20Nemotron--70B%20Instruct-76B900.svg)](https://build.nvidia.com)
