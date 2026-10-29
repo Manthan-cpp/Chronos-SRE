@@ -18,7 +18,10 @@ try:
 except ImportError:
     pass
 
-def default_cors():
+def default_cors() -> list[str]:
+    raw_cors = os.getenv("CORS_ORIGINS", "")
+    if raw_cors.strip():
+        return [origin.strip() for origin in raw_cors.split(",") if origin.strip()]
     return ["http://localhost:3000", "http://127.0.0.1:3000"]
 
 @dataclass

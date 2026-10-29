@@ -184,15 +184,11 @@ async def simulate_scenario(req: SimulateRequest):
         # Dynamic incident simulation trace
         now_str = time.strftime("%Y-%m-%d %H:%M:%S")
         target_name = req.scenarioId
-        failing_file = req.failingFile or "src/lib/fasal/calculator.ts"
+        failing_file = req.failingFile or ""
+        repo_url = (req.repoUrl or "").lower()
         
-        # Check if this is GramRaksha-AI or calculator or issue-2
-        is_gramraksha = (
-            "gramraksha" in (req.repoUrl or "").lower() 
-            or "calculator" in failing_file.lower() 
-            or "issue-2" in target_name.lower()
-            or "fasal" in (req.incidentTitle or "").lower()
-        )
+        # Strictly scoped to GramRaksha-AI demo showcase
+        is_gramraksha = "gramraksha" in repo_url
 
         if is_gramraksha:
             formatted_logs = [

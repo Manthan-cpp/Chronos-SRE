@@ -19,6 +19,8 @@ const INITIAL_AGENTS: AgentNode[] = [
   { id: "sandbox", label: "Ephemeral Sandbox", role: "Deterministic Pytest", status: "idle" }
 ];
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 export function useIncidentStream() {
   const [connectedRepo, setConnectedRepo] = useState<string | null>(null);
   const [repoInput, setRepoInput] = useState<string>("");
@@ -69,7 +71,7 @@ export function useIncidentStream() {
   const discoverIncidents = useCallback(async (repo: string, customLog?: string) => {
     setIsDiscoveringIncidents(true);
     try {
-      const res = await fetch("http://localhost:8000/api/incident/discover", {
+      const res = await fetch(`${API_URL}/api/incident/discover`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -108,7 +110,7 @@ export function useIncidentStream() {
 
     setIsConnectingRepo(true);
     try {
-      const res = await fetch("http://localhost:8000/api/repo/connect", {
+      const res = await fetch(`${API_URL}/api/repo/connect`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ repoUrl: rawInput })
@@ -203,7 +205,7 @@ export function useIncidentStream() {
     ]);
 
     try {
-      const response = await fetch("http://localhost:8000/api/incident/simulate", {
+      const response = await fetch(`${API_URL}/api/incident/simulate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -233,7 +235,7 @@ export function useIncidentStream() {
       const errMsg = err instanceof Error ? err.message : String(err);
       setLiveLogs((prev) => [
         ...prev,
-        `[${new Date().toISOString()}] [FATAL] [backend] Connection failed: ${errMsg}. Is the FastAPI backend running on http://127.0.0.1:8000?`
+        `[${new Date().toISOString()}] [FATAL] [backend] Connection failed: ${errMsg}. Is the FastAPI backend running on ${API_URL}?`
       ]);
     } finally {
       setIsStreamingLogs(false);
@@ -250,7 +252,7 @@ export function useIncidentStream() {
     setActivePhaseMessage("Isolating fatal exception & callstack from telemetry logs...");
 
     try {
-      await fetch("http://localhost:8000/api/incident/trigger", {
+      await fetch(`${API_URL}/api/incident/trigger`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -274,7 +276,7 @@ export function useIncidentStream() {
         incidentTitle: activeScenario.title || ""
       });
 
-      const eventSource = new EventSource(`http://localhost:8000/api/incident/stream?${params.toString()}`);
+      const eventSource = new EventSource(`${API_URL}/api/incident/stream?${params.toString()}`);
       
       eventSource.onmessage = (e) => {
         try {
@@ -321,7 +323,7 @@ export function useIncidentStream() {
       const errMsg = err instanceof Error ? err.message : String(err);
       setReasoningText(
         `### ERROR: BACKEND CONNECTION FAILED\n\n` +
-        `Unable to reach Chronos-SRE backend at http://localhost:8000.\n` +
+        `Unable to reach Chronos-SRE backend at ${API_URL}.\n` +
         `Details: ${errMsg}\n\n` +
         `Please ensure the FastAPI server is running with:\n` +
         `\`py -m uvicorn backend.src.main:app --port 8000\``
@@ -336,7 +338,7 @@ export function useIncidentStream() {
     setIsCreatingPR(true);
     try {
       const targetRepo = connectedRepo || "";
-      const res = await fetch("http://localhost:8000/api/pr/create", {
+      const res = await fetch(`${API_URL}/api/pr/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
