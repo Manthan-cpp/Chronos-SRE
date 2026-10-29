@@ -3,9 +3,10 @@ Nemotron Multi-Agent Forensic Orchestrator.
 Coordinates: Sifter -> AST -> Tavily Scout -> Nemotron Hypothesizer -> Critic -> Synthesizer -> Sandbox Verifier.
 """
 
+from __future__ import annotations
 import asyncio
 from pathlib import Path
-from typing import Dict, Any, AsyncGenerator, Tuple
+from typing import Dict, Any, AsyncGenerator, Tuple, Optional, List
 
 from backend.src.config import settings, ROOT_DIR, SCENARIOS_DIR
 from backend.src.forensics.sifter import telemetry_sifter
