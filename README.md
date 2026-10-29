@@ -11,6 +11,10 @@
 [![Frontend: Next.js 16](https://img.shields.io/badge/Frontend-Next.js%2016%20%7C%20React%2019-000000.svg)](https://nextjs.org)
 [![Backend: FastAPI](https://img.shields.io/badge/Backend-FastAPI%20%7C%20Python%203.11%2B-009688.svg)](https://fastapi.tiangolo.com)
 
+<p align="center">
+  <img src="assets/banner.jpg" alt="Chronos-SRE: Autonomous AI SRE Engine" width="100%" />
+</p>
+
 > **Chronos-SRE** is an enterprise-grade autonomous Site Reliability Engineering platform. Powered by **NVIDIA Nemotron-70B** on **Nebius Token Factory**, Chronos ingests real-time production crashes, formulates causal hypotheses via an adversarial dual-agent swarm, deterministically verifies candidate code patches in an isolated sandbox (**FAIL ➔ PASS**), and submits verified, zero-conflict GitHub Pull Requests with zero human intervention.
 
 ---
@@ -65,35 +69,40 @@ We didn't build another conversational chatbot. We built **Chronos-SRE**—an au
 
 ## ⚡ 4. NVIDIA Nemotron & Nebius Token Factory Integration
 
-Chronos-SRE is built from the ground up to leverage the full power of NVIDIA's frontier open-source models and Nebius's high-speed inference cloud:
+Chronos-SRE is architected around NVIDIA's frontier open-source model **`nvidia/llama-3.1-nemotron-70b-instruct`**, accelerated end-to-end via **Nebius Token Factory**:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                       NEBIUS TOKEN FACTORY RUNTIME                          │
+│                 NVIDIA NEMOTRON-70B x NEBIUS TOKEN FACTORY                  │
 │                                                                             │
-│  [OpenTelemetry Logs] ──▶ [Agent 1: Causal Hypothesis]                      │
-│                                      │ (NVIDIA Nemotron-70B Instruct)       │
-│                                      ▼                                      │
-│  [AST Syntax Tree]    ──▶ [Agent 2: Adversarial Critic]                     │
+│  [OpenTelemetry Logs] ──▶ 1. Causal Root-Cause Analysis (Nemotron-70B)      │
+│                                      │                                      │
+│  [AST Syntax Tree]    ──▶ 2. Adversarial Invariant Critic (Nemotron-70B)    │
 │                                      │ (Zero-Hallucination Guard)           │
 │                                      ▼                                      │
-│                           [Deterministic Code Patch]                        │
-│                           Streaming @ 91.4 tokens/sec                       │
+│                           3. Surgical Code Synthesis (Nemotron-70B)         │
+│                           Streamed via Nebius @ 91.4 tokens/sec             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 🧠 NVIDIA Open-Source Model: Nemotron-70B Instruct
-* **Model**: **`nvidia/llama-3.1-nemotron-70b-instruct`**
-* **Why Nemotron?**: Outperforms baseline LLMs on complex multi-turn reasoning, causal diagnosis, and exact syntax tree code generation. It isolates subtle multi-point defects—such as inverted time horizons, flipped urgency classifications, and missing dictionary fallbacks—that smaller models miss.
+### 🧠 Where & How NVIDIA Nemotron-70B is Used in Chronos-SRE
 
-### 🚀 Nebius Token Factory Acceleration
+Our multi-agent pipeline deploys **`nvidia/llama-3.1-nemotron-70b-instruct`** across three critical stages of incident remediation:
+
+1. **Autonomous Root-Cause Analysis (Causal Reasoning)**:  
+   Nemotron ingests unformatted OpenTelemetry spans and stack traces, sifts out downstream noise, and formulates competing causal hypotheses (Hypothesis A vs. B) to pinpoint the exact failure mechanism (e.g., inverted deadline window arithmetic, circular lock acquisition).
+
+2. **Adversarial Invariant Critic (Hallucination Guard)**:  
+   Before any code is tested, Nemotron cross-examines candidate hypotheses against the repository's Abstract Syntax Tree (AST). It acts as an adversarial judge, discarding phantom dependencies, invalid function calls, and unsafe type assumptions with a **0.99 confidence invariant threshold**.
+
+3. **Autonomous Surgical Code Synthesis**:  
+   Nemotron generates production-grade, deterministic `SEARCH / REPLACE` diff patches. Rather than rewriting entire files, it outputs surgical edits with defensive guard clauses that directly resolve the failing regression tests in the sandbox.
+
+### 🚀 Accelerated by Nebius Token Factory
+* **Target Model**: `nvidia/llama-3.1-nemotron-70b-instruct`
 * **Inference Endpoint**: `https://api.tokenfactory.nebius.com/v1`
-* **Throughput**: Sustained **91.4 tokens/second** streaming rate.
-* **Impact**: Critical Sev-1 incidents require sub-second reasoning loops. Nebius Token Factory delivers instantaneous token generation, ensuring the dual-agent swarm formulates hypotheses and generates multi-chunk code patches in **under 2 seconds**.
-
-### 🛡️ NeMo-Inspired Dual-Agent Architecture
-* **Agent 1 (Causal Discovery)**: Formulates competing hypotheses (A vs B vs C) by evaluating ingested telemetry against the repository's live AST.
-* **Agent 2 (Adversarial Critic & AST Invariant Guard)**: Evaluates candidate code patches against the Abstract Syntax Tree, checking for phantom dependencies, circular imports, and syntax errors with a **0.99 confidence invariant gate** before sandbox execution.
+* **Real-Time Throughput**: Sustained **91.4 tokens/second** with sub-second Time-To-First-Token (TTFT).
+* **Why It Matters**: During a Sev-1 outage, waiting 30 seconds for an LLM response is unacceptable. Nebius Token Factory streams Nemotron's complete diagnostic reasoning and surgical patch to the war-room UI in **under 2 seconds**.
 
 ---
 
