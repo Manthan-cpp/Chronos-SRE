@@ -16,6 +16,8 @@
 </p>
 
 > **Chronos-SRE** is an enterprise-grade autonomous Site Reliability Engineering platform. Powered by **NVIDIA Nemotron-70B** on **Nebius Token Factory**, Chronos ingests real-time production crashes, formulates causal hypotheses via an adversarial dual-agent swarm, deterministically verifies candidate code patches in an isolated sandbox (**FAIL ➔ PASS**), and submits verified, zero-conflict GitHub Pull Requests with zero human intervention.
+>
+> ⏳ **Live Demo Note**: The FastAPI backend is hosted on Render's free tier and automatically spins down after 15 minutes of inactivity; please allow ~45–60 seconds on the first action for the container to spin up.
 
 ---
 
