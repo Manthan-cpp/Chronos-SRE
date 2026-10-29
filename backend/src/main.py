@@ -309,7 +309,17 @@ async def stream_incident(
                     yield f"data: {json.dumps({'type': 'sandbox_update', 'sandbox': {'step': 'verified_pass', 'reproCommand': 'pytest -v', 'initialOutput': sb['pre_output'], 'patchedOutput': sb['post_output'], 'initialExitCode': 1}})}\n\n"
                     yield f"data: {json.dumps({'type': 'agent_update', 'agentId': 'sandbox', 'status': 'completed', 'message': 'Deterministic verification complete: Regression test passed (EXIT 0).'})}\n\n"
                     patch_info = VERIFIED_PATCHES.get(norm_key, {})
-                    yield f"data: {json.dumps({'type': 'patch_ready', 'patch': {'filePath': patch_data['file'], 'originalCode': '# Original unpatched code with fault\\n', 'patchedCode': patch_info.get('patched_code', ''), 'diffSummary': '+5 lines, -2 lines (Deterministic Fix)', 'branchName': f'chronos/fix-{norm_key.lower()}'}})}\n\n"
+                    patch_payload = {
+                        "type": "patch_ready",
+                        "patch": {
+                            "filePath": patch_data["file"],
+                            "originalCode": "# Original unpatched code with fault\n",
+                            "patchedCode": patch_info.get("patched_code", ""),
+                            "diffSummary": "+5 lines, -2 lines (Deterministic Fix)",
+                            "branchName": f"chronos/fix-{norm_key.lower()}"
+                        }
+                    }
+                    yield f"data: {json.dumps(patch_payload)}\n\n"
                 await asyncio.sleep(0.01)
 
         else:
